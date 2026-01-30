@@ -8,7 +8,7 @@
 /* Status Section */
 .ai-status-section {
   padding: 12px;
-  background: #f9f9f9;
+  background: var(--figma-color-bg-secondary, #f9f9f9);
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -23,7 +23,7 @@
 .ai-status-label {
   font-size: 11px;
   font-weight: 600;
-  color: #333;
+  color: var(--figma-color-text, #333);
 }
 
 .ai-status-indicator {
@@ -44,7 +44,66 @@
 }
 
 .ai-status-message {
-  margin-top: 8px;
+  margin-top: 12px;
+}
+
+.ai-status-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--figma-color-text, #333);
+  margin: 0 0 8px !important;
+}
+
+.ai-status-description {
+  font-size: 11px;
+  color: var(--figma-color-text-secondary, #666);
+  margin: 0 0 6px !important;
+  line-height: 1.4;
+}
+
+.ai-status-list {
+  margin: 0 0 12px;
+  padding-left: 16px;
+  font-size: 11px;
+  color: var(--figma-color-text-secondary, #666);
+  line-height: 1.6;
+}
+
+.ai-status-list li {
+  margin-bottom: 2px;
+}
+
+.ai-code-block {
+  display: block;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  font-size: 11px;
+  margin: 8px 0 12px;
+  overflow-x: auto;
+  white-space: nowrap;
+  user-select: all;
+  cursor: text;
+}
+
+.ai-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.ai-setup-link {
+  font-size: 11px;
+  color: #18a0fb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.ai-setup-link:hover {
+  text-decoration: underline;
 }
 
 .ai-status-message p {
@@ -68,7 +127,7 @@
   display: flex;
   gap: 16px;
   padding: 8px 12px;
-  background: #f9f9f9;
+  background: var(--figma-color-bg-secondary, #f9f9f9);
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -81,19 +140,19 @@
 
 .ai-stats-label {
   font-size: 10px;
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
 }
 
 .ai-stats-value {
   font-size: 11px;
   font-weight: 600;
-  color: #333;
+  color: var(--figma-color-text, #333);
 }
 
 /* Feature Section */
 .ai-feature-section {
   padding: 12px;
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--figma-color-border, #e5e5e5);
   border-radius: 8px;
   margin-bottom: 12px;
 }
@@ -101,13 +160,13 @@
 .ai-feature-title {
   font-size: 12px;
   font-weight: 600;
-  color: #333;
+  color: var(--figma-color-text, #333);
   margin: 0 0 4px;
 }
 
 .ai-feature-description {
   font-size: 11px;
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
   margin: 0 0 12px;
   line-height: 1.4;
 }
@@ -124,7 +183,7 @@
 /* Result Section */
 .ai-result-section {
   margin-top: 16px;
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--figma-color-border, #e5e5e5);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -134,14 +193,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  background: #f9f9f9;
-  border-bottom: 1px solid #e5e5e5;
+  background: var(--figma-color-bg-secondary, #f9f9f9);
+  border-bottom: 1px solid var(--figma-color-border, #e5e5e5);
 }
 
 .ai-result-header h4 {
   font-size: 11px;
   font-weight: 600;
-  color: #333;
+  color: var(--figma-color-text, #333);
   margin: 0;
 }
 
@@ -154,7 +213,7 @@
 .ai-result-text {
   font-size: 11px;
   line-height: 1.5;
-  color: #333;
+  color: var(--figma-color-text, #333);
   white-space: pre-wrap;
   word-wrap: break-word;
   font-family:
@@ -198,8 +257,8 @@
 .ai-processing-spinner {
   width: 24px;
   height: 24px;
-  border: 2px solid #e5e5e5;
-  border-top-color: #18a0fb;
+  border: 2px solid var(--figma-color-border, #e5e5e5);
+  border-top-color: var(--figma-color-text-brand, #18a0fb);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 12px;
@@ -213,14 +272,14 @@
 
 .ai-processing-text {
   font-size: 11px;
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
   text-align: center;
 }
 
 /* Tabs for features (if needed) */
 .ai-tabs {
   display: flex;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--figma-color-border, #e5e5e5);
   margin-bottom: 16px;
 }
 
@@ -231,14 +290,14 @@
   border: none;
   font-size: 11px;
   font-weight: 500;
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: all 100ms ease;
 }
 
 .ai-tab:hover {
-  color: #333;
+  color: var(--figma-color-text, #333);
 }
 
 .ai-tab.active {
@@ -249,10 +308,10 @@
 /* Rich Context Section */
 .ai-context-section {
   padding: 12px;
-  background: linear-gradient(135deg, #f0f7ff 0%, #f5f0ff 100%);
+  background: var(--figma-color-bg-secondary, #f5f5f5);
   border-radius: 8px;
   margin-bottom: 16px;
-  border: 1px solid #e0e7ff;
+  border: 1px solid var(--figma-color-border, #e0e7ff);
 }
 
 .ai-context-header {
@@ -265,7 +324,7 @@
 .ai-context-label {
   font-size: 11px;
   font-weight: 600;
-  color: #333;
+  color: var(--figma-color-text, #333);
 }
 
 .ai-context-refresh {
@@ -275,13 +334,13 @@
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 4px;
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
   transition: all 100ms ease;
 }
 
 .ai-context-refresh:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: #18a0fb;
+  background: var(--figma-color-bg-hover, rgba(0, 0, 0, 0.05));
+  color: var(--figma-color-text-brand, #18a0fb);
 }
 
 .ai-context-refresh:disabled {
@@ -291,31 +350,33 @@
 
 .ai-context-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   margin-bottom: 8px;
 }
 
 .ai-context-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 6px 4px;
-  background: rgba(255, 255, 255, 0.7);
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--figma-color-bg, rgba(255, 255, 255, 0.7));
   border-radius: 6px;
 }
 
 .ai-context-value {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: #18a0fb;
+  color: var(--figma-color-text-brand, #18a0fb);
+  min-width: 32px;
 }
 
 .ai-context-desc {
-  font-size: 9px;
-  color: #666;
+  font-size: 10px;
+  color: var(--figma-color-text-secondary, #666);
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  line-height: 1.2;
 }
 
 .ai-context-patterns {
@@ -329,12 +390,12 @@
 .ai-context-pattern-label {
   font-size: 10px;
   font-weight: 500;
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
 }
 
 .ai-context-pattern-values {
   font-size: 10px;
-  color: #333;
+  color: var(--figma-color-text, #333);
   font-family: monospace;
 }
 
@@ -342,8 +403,8 @@
   padding: 12px;
   text-align: center;
   font-size: 11px;
-  color: #666;
-  background: #f9f9f9;
+  color: var(--figma-color-text-secondary, #666);
+  background: var(--figma-color-bg-secondary, #f9f9f9);
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -358,7 +419,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--figma-color-border, #e5e5e5);
 }
 
 .ai-rename-item:last-child {
@@ -375,7 +436,7 @@
 
 .ai-rename-original {
   font-size: 11px;
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
   text-decoration: line-through;
   max-width: 100px;
   overflow: hidden;
@@ -384,14 +445,14 @@
 }
 
 .ai-rename-arrow {
-  color: #999;
+  color: var(--figma-color-text-tertiary, #999);
   font-size: 12px;
 }
 
 .ai-rename-suggested {
   font-size: 11px;
   font-weight: 500;
-  color: #18a0fb;
+  color: var(--figma-color-text-brand, #18a0fb);
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;

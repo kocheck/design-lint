@@ -1,11 +1,12 @@
 {
-  "name": "Design Lint",
+  "name": "Lint Me",
   "id": "801195587640428208",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",
   "editorType": ["figma"],
   "networkAccess": {
-    "allowedDomains": ["none"]
+    "allowedDomains": ["http://localhost:11434"],
+    "reasoning": "Connects to local Ollama instance for optional AI-powered design review and layer renaming features. All AI processing happens locally on the user's machine."
   }
 }

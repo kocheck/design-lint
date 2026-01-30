@@ -272,16 +272,37 @@ function AIPanel(props: AIPanelProps) {
 
             {!isAvailable && !isChecking && (
               <div className="ai-status-message">
-                <p>
-                  Ollama is not running. Start Ollama on your machine to enable
-                  AI features.
+                <p className="ai-status-title">Can't connect to Ollama</p>
+                <p className="ai-status-description">
+                  This could be because:
                 </p>
-                <button
-                  className="button button--secondary"
-                  onClick={checkAvailability}
-                >
-                  Retry Connection
-                </button>
+                <ul className="ai-status-list">
+                  <li>Ollama isn't running</li>
+                  <li>CORS isn't configured (most common)</li>
+                </ul>
+                <p className="ai-status-description">
+                  Figma plugins require Ollama to allow cross-origin requests.
+                  Run this in Terminal, then restart Ollama:
+                </p>
+                <code className="ai-code-block">
+                  launchctl setenv OLLAMA_ORIGINS "*"
+                </code>
+                <div className="ai-status-actions">
+                  <button
+                    className="button button--secondary"
+                    onClick={checkAvailability}
+                  >
+                    Retry Connection
+                  </button>
+                  <a
+                    href="https://github.com/kocheck/design-lint/blob/main/docs/ollama-setup.md"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ai-setup-link"
+                  >
+                    Full Setup Guide →
+                  </a>
+                </div>
               </div>
             )}
 

@@ -6,7 +6,7 @@
   right: 0;
   padding: 0;
   z-index: 10;
-  background: #fff;
+  background: var(--figma-color-bg, #fff);
   display: flex;
   flex-flow: column;
 }
@@ -16,7 +16,7 @@
   align-content: center;
   padding: 8px 12px 8px 8px;
   margin-bottom: 8px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--figma-color-border, #e5e5e5);
 }
 
 .panel-header__action {
@@ -27,7 +27,7 @@
   flex: 1;
   font-weight: 400;
   font-size: 13px;
-  color: #333;
+  color: var(--figma-color-text, #333);
   display: flex;
   align-items: center;
   -webkit-line-clamp: 2;
@@ -99,7 +99,7 @@
   margin-bottom: 8px;
   font-weight: 600;
   font-size: 11px;
-  color: #111;
+  color: var(--figma-color-text, #111);
 }
 
 .comparison-value {
@@ -112,7 +112,7 @@
 }
 
 .panel-footer {
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--figma-color-border, #e5e5e5);
   padding: 16px;
   display: flex;
   align-items: center;
@@ -132,16 +132,16 @@
 
 .pill {
   min-width: 44px;
-  border: 1px solid #dcddde;
+  border: 1px solid var(--figma-color-border, #dcddde);
   border-radius: 16px;
   font-family: "Inter";
   font-style: normal;
   font-weight: 500;
   font-size: 10px;
   line-height: 14px;
-  color: #333;
+  color: var(--figma-color-text, #333);
   text-align: center;
-  background: #fff;
+  background: var(--figma-color-bg, #fff);
   margin-left: 4px;
   padding: 4px 8px;
   text-transform: capitalize;
@@ -150,7 +150,7 @@
 }
 
 .pill:hover {
-  border-color: #c1c1c1;
+  border-color: var(--figma-color-border-strong, #c1c1c1);
 }
 
 .pill-divider {
@@ -162,7 +162,7 @@
   line-height: 14px;
   margin-left: 4px;
   padding: 4px;
-  color: #e5e5e5;
+  color: var(--figma-color-border, #e5e5e5);
 }
 
 .selected {
@@ -234,8 +234,8 @@
 .banner {
   height: 52px;
   padding: 12px 8px 12px 12px;
-  border: 1px solid #dcddde99;
-  color: #333333;
+  border: 1px solid var(--figma-color-border, #dcddde99);
+  color: var(--figma-color-text, #333333);
   margin-bottom: 12px;
   border-radius: 12px;
   display: flex;
@@ -246,8 +246,8 @@
   line-height: 13px;
   font-weight: 600;
   transition: border-color 100ms ease;
-  box-shadow: 0px 2px 2px 0px #d2d2d240;
-  background: #fff;
+  box-shadow: var(--figma-color-bg-secondary, 0px 2px 2px 0px #d2d2d240);
+  background: var(--figma-color-bg, #fff);
 }
 
 .banner .error-background-banner {
@@ -262,8 +262,8 @@
 .error-list-item {
   position: relative;
   padding: 12px 12px 12px 12px;
-  border: 1px solid #dcddde99;
-  color: #333333;
+  border: 1px solid var(--figma-color-border, #dcddde99);
+  color: var(--figma-color-text, #333333);
   margin-bottom: 12px;
   border-radius: 16px;
   display: flex;
@@ -274,8 +274,8 @@
   line-height: 13px;
   font-weight: 600;
   transition: border-color 100ms ease;
-  box-shadow: 0px 2px 2px 0px #d2d2d240;
-  background: #fff;
+  box-shadow: none;
+  background: var(--figma-color-bg-secondary, #fff);
 }
 
 /* .error-list-item:hover {
@@ -290,7 +290,7 @@
 
 .label {
   font-size: 12px;
-  color: #9f9f9f;
+  color: var(--figma-color-text-secondary, #9f9f9f);
   font-weight: 400;
   margin: 8px 0 2px;
 }
@@ -299,7 +299,7 @@
 .current-value {
   margin-top: 4px;
   width: 100%;
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
   font-size: 11px;
   line-height: 14px;
   font-weight: 400;
@@ -336,11 +336,11 @@
 }
 
 .error-description__message:hover {
-  color: #111;
+  color: var(--figma-color-text, #111);
 }
 
 .error-description__count {
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
   font-weight: 400;
 }
 
@@ -352,7 +352,7 @@
   width: 30px;
   flex-basis: 30px;
   flex-shrink: 0;
-  background: #f6f6f6;
+  background: var(--figma-color-bg-tertiary, #f6f6f6);
   align-self: center;
   border-radius: 64px;
 }
@@ -447,14 +447,14 @@
 }
 
 .success-message {
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--figma-color-border, #e5e5e5);
   border-radius: 6px;
   text-align: center;
   font-size: 13px;
   padding: 40px 0;
   margin: 16px;
   margin-top: 8px;
-  color: #333;
+  color: var(--figma-color-text, #333);
 }
 
 .success-shape {
@@ -497,7 +497,7 @@
 .settings-title {
   font-size: 11px;
   font-weight: 500;
-  color: #111;
+  color: var(--figma-color-text, #111);
   padding-bottom: 8px;
   margin: 0;
 }
@@ -506,7 +506,7 @@
   display: block;
   font-size: 11px;
   line-height: 1.4;
-  color: #333333;
+  color: var(--figma-color-text, #333333);
   padding-bottom: 12px;
 }
 
@@ -519,12 +519,13 @@
   margin-bottom: 8px;
   padding: 8px;
   border-radius: 2px;
-  background: #ffffff;
-  border: 1px solid #f0f0f0;
+  background: var(--figma-color-bg, #ffffff);
+  border: 1px solid var(--figma-color-border, #f0f0f0);
   box-sizing: border-box;
   font-size: 11px;
   line-height: 14px;
   letter-spacing: 0.01em;
+  color: var(--figma-color-text, #333);
 }
 
 .settings-input:focus {
@@ -601,7 +602,7 @@
 }
 
 .rule-config-item:hover {
-  background-color: #f6f6f6;
+  background-color: var(--figma-color-bg-hover, #f6f6f6);
 }
 
 .rule-config-checkbox {
@@ -620,13 +621,13 @@
 .rule-config-label {
   font-size: 11px;
   font-weight: 500;
-  color: #333;
+  color: var(--figma-color-text, #333);
   margin-bottom: 2px;
 }
 
 .rule-config-description {
   font-size: 10px;
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
   line-height: 1.3;
 }
 

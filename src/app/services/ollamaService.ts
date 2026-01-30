@@ -66,14 +66,19 @@ export async function checkOllamaAvailability(
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
+    console.log("[Ollama] Checking availability at:", `${baseUrl}/api/tags`);
+
     const response = await fetch(`${baseUrl}/api/tags`, {
       method: "GET",
+      mode: "cors",
       signal: controller.signal,
     });
 
     clearTimeout(timeoutId);
+    console.log("[Ollama] Response status:", response.status, response.ok);
     return response.ok;
-  } catch {
+  } catch (error) {
+    console.error("[Ollama] Connection error:", error);
     return false;
   }
 }
