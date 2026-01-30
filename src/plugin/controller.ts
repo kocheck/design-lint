@@ -47,7 +47,11 @@ import type {
   RichDesignContext,
 } from "../types";
 
-figma.showUI(__html__, { width: 360, height: 580 });
+figma.showUI(__html__, {
+  width: 420,
+  height: 580,
+  themeColors: true // Enables native resize handles
+});
 
 let borderRadiusArray = [0, 2, 4, 8, 16, 24, 32];
 let originalNodeTree: readonly SceneNode[] = [];

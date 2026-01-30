@@ -1,4 +1,186 @@
-/* Overrides */
+/* ============================================
+   THEME OVERRIDES - Dark mode support
+   ============================================ */
+
+/* ============================================
+   TOOLTIPS
+   ============================================ */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: #1e1e1e;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.3;
+  white-space: nowrap;
+  border-radius: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Tooltip arrow */
+[data-tooltip]::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #1e1e1e;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Tooltip positioning variant - show below */
+[data-tooltip-position="bottom"]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+}
+
+[data-tooltip-position="bottom"]::before {
+  bottom: auto;
+  top: calc(100% + 2px);
+  border-top-color: transparent;
+  border-bottom-color: #1e1e1e;
+}
+
+/* ============================================
+   ICON THEMING - Dark mode support for img-based SVGs
+   ============================================ */
+
+/* Figma dark mode class-based detection (added by App.tsx) */
+html.figma-dark .library-icon:not(.library-icon--colored),
+html.figma-dark .list-icon img,
+html.figma-dark .sublist-item-icon img {
+  filter: invert(1) brightness(0.85);
+}
+
+/* Also support system preference as fallback */
+@media (prefers-color-scheme: dark) {
+  .library-icon:not(.library-icon--colored),
+  .list-icon img,
+  .sublist-item-icon img {
+    filter: invert(1) brightness(0.85);
+  }
+}
+
+/* Colored icons should not be inverted */
+.library-icon--colored {
+  filter: none !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--figma-color-bg, #f1f1f1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--figma-color-border-strong, #888);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--figma-color-text-secondary, #555);
+}
+
+/* Input styles */
+.input,
+.input-icon__input,
+.settings-input {
+  background: var(--figma-color-bg, #fff) !important;
+  color: var(--figma-color-text, #000) !important;
+  border-color: var(--figma-color-border, rgba(0, 0, 0, 0.1)) !important;
+}
+
+.input::placeholder,
+.input-icon__input::placeholder,
+.settings-input::placeholder {
+  color: var(--figma-color-text-tertiary, rgba(0, 0, 0, 0.3)) !important;
+}
+
+/* Input icon - theme aware */
+.input-icon__icon {
+  color: var(--figma-color-text-secondary, #666);
+}
+
+.input-icon__icon svg,
+.input-icon__icon img {
+  filter: var(--icon-filter, none);
+}
+
+/* For dark mode, invert icons that are black */
+@media (prefers-color-scheme: dark) {
+  .input-icon svg path[fill="black"],
+  .input-icon svg path[fill="#000"],
+  .input-icon svg path[fill="#000000"] {
+    fill: currentColor;
+  }
+}
+
+/* Secondary button */
+.button--secondary {
+  background: var(--figma-color-bg, #fff) !important;
+  color: var(--figma-color-text, #000) !important;
+  border-color: var(--figma-color-text, #000) !important;
+}
+
+.button--secondary:hover {
+  background: var(--figma-color-bg-hover, #f0f0f0) !important;
+}
+
+/* Checkbox and label */
+.checkbox__label,
+.settings-checkbox-group label {
+  color: var(--figma-color-text, #333);
+}
+
+/* Checkbox styling for dark mode */
+input[type="checkbox"] {
+  accent-color: var(--figma-color-text-brand, #18a0fb);
+}
+
+/* Icon color overrides for dark mode */
+.icon--black-3 {
+  color: var(--figma-color-icon-tertiary, rgba(0, 0, 0, 0.3)) !important;
+  opacity: 1;
+  filter: var(--figma-icon-filter, none);
+}
+
+/* For icons using background images, invert in dark mode */
+[class*="icon--"]:not(.icon--button) {
+  filter: var(--figma-icon-filter, none);
+}
 
 .button--flex {
   flex: 1;
@@ -29,10 +211,11 @@ button:focus {
   cursor: pointer;
   font-size: 18px;
   background: transparent;
+  color: var(--figma-color-text, #333);
 }
 
 .button--icon:hover {
-  background: #f9f9f9;
+  background: var(--figma-color-bg-hover, #f9f9f9);
 }
 
 /* .button--icon:active {
@@ -51,7 +234,7 @@ button:focus {
 .settings-button {
   border-radius: 8px;
   background-color: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.8);
+  border: none;
 }
 
 .w12 {
@@ -85,14 +268,14 @@ body {
   display: flex;
   align-content: center;
   justify-content: flex-start;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--figma-color-border, #e5e5e5);
 }
 
 .nav-item {
   padding: 8px;
   font-weight: 600;
   font-size: 11px;
-  color: #b3b3b3;
+  color: var(--figma-color-text-tertiary, #b3b3b3);
   cursor: pointer;
   transition: color 100ms ease-out;
   align-self: center;
@@ -105,15 +288,35 @@ body {
   align-content: center;
 }
 
-.ai-button {
-  font-size: 9px;
-  font-weight: 600;
-  color: #18a0fb;
-}
-
 .ai-icon {
   font-size: 9px;
   font-weight: 700;
+  color: var(--figma-color-text-brand, #18a0fb);
+}
+
+/* Navigation icon buttons - theme aware */
+.nav-icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--figma-color-text-secondary, #666);
+  cursor: pointer;
+  transition: color 100ms ease, background-color 100ms ease;
+}
+
+.nav-icon-button:hover {
+  color: var(--figma-color-text, #333);
+  background-color: var(--figma-color-bg-hover, rgba(0, 0, 0, 0.06));
+}
+
+.nav-icon-button svg {
+  width: 14px;
+  height: 14px;
 }
 
 /* Figma icon button override */
@@ -123,15 +326,15 @@ body {
 }
 
 .icon--button:hover {
-  background-color: #f9f9f9;
+  background-color: var(--figma-color-bg-hover, rgba(0, 0, 0, 0.06));
 }
 
 .nav-item:hover {
-  color: rgba(0, 0, 0, 0.8);
+  color: var(--figma-color-text, rgba(0, 0, 0, 0.8));
 }
 
 .nav-item.active {
-  color: rgba(0, 0, 0, 0.8);
+  color: var(--figma-color-text, rgba(0, 0, 0, 0.8));
   font-weight: 600;
 }
 
@@ -182,11 +385,11 @@ body {
 }
 
 .list-item--selected > .list-flex-row {
-  background: #daebf7;
+  background: var(--figma-color-bg-selected, #daebf7);
 }
 
 .list-item--selected ul {
-  background: #edf5fa;
+  background: var(--figma-color-bg-selected-secondary, #edf5fa);
 }
 
 .list-item--active > ul {
@@ -218,10 +421,9 @@ body {
   display: flex;
   flex-flow: row;
   border: none;
-  /* border-top: 1px solid #e5e5e5; */
   padding: 8px 8px 8px 12px;
   margin-top: 12px;
-  background: #f9f9f9;
+  background: var(--figma-color-bg-secondary, #f9f9f9);
   border-radius: 12px;
 }
 
@@ -231,7 +433,7 @@ body {
   margin-top: 16px;
   margin-bottom: 4px;
   font-weight: 400;
-  color: #666;
+  color: var(--figma-color-text-secondary, #666);
   font-size: 9px;
 }
 
@@ -240,10 +442,8 @@ body {
   display: flex;
   flex-flow: row;
   border: none;
-  /* border-top: 1px solid #e5e5e5; */
   padding: 8px 8px 8px 12px;
-
-  background: #f9f9f9;
+  background: var(--figma-color-bg-secondary, #f9f9f9);
   border-radius: 12px;
 }
 
@@ -292,7 +492,7 @@ body {
 
 .auto-fix-style-clickable:hover .style-name {
   text-decoration: underline;
-  color: #111;
+  color: var(--figma-color-text, #111);
   cursor: pointer;
 }
 
@@ -300,7 +500,7 @@ body {
   font-size: 9px;
   font-weight: 400;
   padding-bottom: 4px;
-  color: #666666;
+  color: var(--figma-color-text-secondary, #666666);
 }
 
 .style-value {
@@ -336,9 +536,9 @@ body {
   font-size: 11px;
   line-height: 11px;
   height: 28px;
-  background-color: #f9f9f9;
-  border: 1px solid #666;
-  color: #333;
+  background-color: var(--figma-color-bg-secondary, #f9f9f9);
+  border: 1px solid var(--figma-color-text-secondary, #666);
+  color: var(--figma-color-text, #333);
   padding: 8px 12px;
   align-self: flex-end;
   margin-left: auto;
@@ -354,9 +554,9 @@ body {
   font-size: 11px;
   line-height: 11px;
   height: 28px;
-  background-color: #f9f9f9;
-  border: 1px solid #333;
-  color: #333;
+  background-color: var(--figma-color-bg-secondary, #f9f9f9);
+  border: 1px solid var(--figma-color-text, #333);
+  color: var(--figma-color-text, #333);
   padding: 8px 12px;
   align-self: flex-end;
   margin-left: auto;
@@ -402,7 +602,7 @@ body {
 }
 
 .match-button-loading .button-dot {
-  background-color: #666;
+  background-color: var(--figma-color-text-secondary, #666);
 }
 
 @keyframes scaleUpDown {
@@ -478,7 +678,7 @@ body {
 }
 
 .list-flex-row:hover {
-  border-color: #18a0fb;
+  border-color: var(--figma-color-text-brand, #18a0fb);
 }
 
 .list-flex-row:hover .list-arrow-icon {
@@ -487,7 +687,7 @@ body {
 
 .list-icon {
   width: 16px;
-  opacity: 0.3;
+  opacity: 0.5;
 }
 
 .list-icon img {
@@ -524,8 +724,8 @@ body {
   position: relative;
   font-size: 12px;
   font-weight: 400;
-  color: #333333;
-  border-top: 1px solid #e5e5e5;
+  color: var(--figma-color-text, #333333);
+  border-top: 1px solid var(--figma-color-border, #e5e5e5);
   display: flex;
   align-items: center;
   padding: 2px 16px 2px 8px;
@@ -540,7 +740,7 @@ body {
   left: 0;
   width: 100%;
   position: absolute;
-  background: #fff;
+  background: var(--figma-color-bg, #fff);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -556,7 +756,7 @@ body {
 
 .actions-row {
   padding: 16px 16px 14px;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--figma-color-border, #e5e5e5);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -587,7 +787,7 @@ body {
 }
 
 .menu-trigger:hover {
-  background: #f9f9f9;
+  background: var(--figma-color-bg-hover, #f9f9f9);
   border-radius: 16px;
   cursor: pointer;
 }
@@ -621,7 +821,7 @@ body {
 }
 
 .select-menu__list-border {
-  border-top: 2px solid #333;
+  border-top: 2px solid var(--figma-color-text, #333);
   padding-top: 8px;
   padding-bottom: 6px;
   height: auto;
@@ -645,8 +845,8 @@ body {
   top: 100%;
   left: 0;
   margin-top: 4px;
-  background: #fff;
-  border: 1px solid #e5e5e5;
+  background: var(--figma-color-bg, #fff);
+  border: 1px solid var(--figma-color-border, #e5e5e5);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 100;
@@ -658,9 +858,9 @@ body {
   padding: 8px 12px;
   font-size: 10px;
   font-weight: 600;
-  color: #666;
-  border-bottom: 1px solid #e5e5e5;
-  background: #f9f9f9;
+  color: var(--figma-color-text-secondary, #666);
+  border-bottom: 1px solid var(--figma-color-border, #e5e5e5);
+  background: var(--figma-color-bg-secondary, #f9f9f9);
   text-transform: capitalize;
 }
 
@@ -668,33 +868,33 @@ body {
   width: 100%;
   padding: 8px 12px;
   border: none;
-  background: #fff;
+  background: var(--figma-color-bg, #fff);
   text-align: left;
   font-size: 11px;
-  color: #333;
+  color: var(--figma-color-text, #333);
   cursor: pointer;
   transition: background-color 100ms ease;
 }
 
 .batch-menu-item:hover {
-  background: #f0f0f0;
+  background: var(--figma-color-bg-hover, #f0f0f0);
 }
 
 .batch-menu-item-primary {
-  color: #18a0fb;
+  color: var(--figma-color-text-brand, #18a0fb);
   font-weight: 500;
 }
 
 .batch-menu-item-primary:hover {
-  background: #e6f4ff;
+  background: var(--figma-color-bg-brand-tertiary, #e6f4ff);
 }
 
 .batch-menu-item-danger {
-  color: #fe6262;
+  color: var(--figma-color-text-danger, #fe6262);
 }
 
 .batch-menu-item-danger:hover {
-  background: #fff0f0;
+  background: var(--figma-color-bg-danger-tertiary, #fff0f0);
 }
 
 /* ========================================

@@ -46,7 +46,19 @@ function SettingsForm(props: SettingsFormProps) {
 
         <div className="input-icon">
           <div className="input-icon__icon">
-            <div className="icon icon--corner-radius icon--black-3"></div>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ opacity: 0.5, marginTop: '10px', marginLeft: '10px' }}
+            >
+              <path
+                d="M12 1H7C3.68629 1 1 3.68629 1 7V12H0V7C0 3.13401 3.13401 0 7 0H12V1Z"
+                fill="currentColor"
+              />
+            </svg>
           </div>
           <input
             type="input"

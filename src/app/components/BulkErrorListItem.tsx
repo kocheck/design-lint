@@ -153,7 +153,20 @@ function BulkErrorListItem(props: BulkErrorListItemProps) {
         <span className="context-icon tap-effect">
           <div className="menu" ref={ref}>
             <div className="menu-trigger" onClick={showMenu}>
-              <img src={require("../assets/context.svg")} />
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M6 10.5C6 11.3284 5.3284 12 4.5 12C3.67157 12 3 11.3284 3 10.5C3 9.6716 3.67157 9 4.5 9C5.3284 9 6 9.6716 6 10.5ZM12 10.5C12 11.3284 11.3284 12 10.5 12C9.6716 12 9 11.3284 9 10.5C9 9.6716 9.6716 9 10.5 9C11.3284 9 12 9.6716 12 10.5ZM16.5 12C17.3284 12 18 11.3284 18 10.5C18 9.6716 17.3284 9 16.5 9C15.6716 9 15 9.6716 15 10.5C15 11.3284 15.6716 12 16.5 12Z"
+                  fill="currentColor"
+                />
+              </svg>
             </div>
           </div>
         </span>

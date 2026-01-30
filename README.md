@@ -1,12 +1,14 @@
-# Design Lint
+# Lint Me
+
+> **Note:** This is a fork of [Design Lint](https://github.com/destefanis/design-lint) by Daniel Destefanis. The original plugin is excellent - this fork adds AI features, enhanced lint rules, and other improvements while maintaining compatibility with the original.
 
 ![Design Lint Gif Example](https://github.com/destefanis/design-lint/blob/master/assets/lint-example.gif)
 
-Find and fix errors in your designs with Design Lint, a plugin for Figma.
+Find and fix errors in your designs with Lint Me, a plugin for Figma.
 
-[View Original Plugin Page](https://www.figma.com/c/plugin/801195587640428208)
+[View Original Plugin](https://www.figma.com/c/plugin/801195587640428208) | [Original Repository](https://github.com/destefanis/design-lint)
 
-Design Lint finds missing styles within your designs on all your layers. Ensure your designs are ready for development or design collaboration by fixing inconsistencies.
+Lint Me finds missing styles within your designs on all your layers. Ensure your designs are ready for development or design collaboration by fixing inconsistencies.
 
 ## Features
 

@@ -4,59 +4,54 @@
 	"description": "This plugin template uses Typescript. If you are familiar with Javascript, Typescript will look very familiar. In fact, valid Javascript code is already valid Typescript code.",
 	"license": "ISC",
 	"scripts": {
-		"build": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production",
-		"build:watch": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode=development --watch",
-		"lint": "eslint 'src/**/*.{ts,tsx}' --max-warnings 0",
+		"build": "webpack --mode=production",
+		"build:watch": "webpack --mode=development --watch",
+		"lint": "eslint 'src/**/*.{ts,tsx}'",
 		"lint:fix": "eslint 'src/**/*.{ts,tsx}' --fix",
 		"typecheck": "tsc --noEmit",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",
-		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}'"
+		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}'",
+		"prepare": "husky"
 	},
 	"dependencies": {
 		"classnames": "^2.2.6",
-		"react": "^17.0.2",
-		"react-dom": "^17.0.2",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
 		"react-hint": "^3.2.1",
 		"react-tooltip": "^5.11.1"
 	},
 	"devDependencies": {
-		"@figma/eslint-plugin-figma-plugins": "^0.15.0",
+		"@eslint/js": "^9.18.0",
+		"@figma/eslint-plugin-figma-plugins": "^1.0.0",
 		"@figma/plugin-typings": "^1.100.0",
 		"@types/jest": "^30.0.0",
-		"@types/react": "^17.0.0",
-		"@types/react-dom": "^17.0.0",
-		"@typescript-eslint/eslint-plugin": "^6.21.0",
-		"@typescript-eslint/parser": "^6.21.0",
-		"css-loader": "^3.1.0",
-		"eslint": "^8.57.0",
-		"eslint-plugin-react": "^7.34.0",
-		"eslint-plugin-react-hooks": "^4.6.0",
-		"html-webpack-inline-source-plugin": "^0.0.10",
-		"html-webpack-plugin": "^3.2.0",
-		"husky": "^3.0.2",
+		"@types/react": "^18.3.0",
+		"@types/react-dom": "^18.3.0",
+		"css-loader": "^7.1.0",
+		"eslint": "^9.18.0",
+		"eslint-plugin-react": "^7.37.0",
+		"eslint-plugin-react-hooks": "^5.1.0",
+		"globals": "^15.0.0",
+		"html-inline-script-webpack-plugin": "^3.2.0",
+		"html-webpack-plugin": "^5.6.0",
+		"husky": "^9.1.0",
 		"identity-obj-proxy": "^3.0.0",
 		"jest": "^30.2.0",
-		"lint-staged": "^9.2.1",
+		"lint-staged": "^15.2.0",
 		"prettier": "^3.2.0",
-		"style-loader": "^0.23.1",
+		"style-loader": "^4.0.0",
 		"ts-jest": "^29.4.6",
-		"ts-loader": "^8.4.0",
-		"typescript": "^5.3.0",
-		"url-loader": "^2.1.0",
-		"webpack": "^4.39.1",
-		"webpack-cli": "^3.3.6"
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
+		"ts-loader": "^9.5.0",
+		"typescript": "^5.7.0",
+		"typescript-eslint": "^8.20.0",
+		"webpack": "^5.97.0",
+		"webpack-cli": "^6.0.0"
 	},
 	"lint-staged": {
 		"src/**/*.{js,jsx,ts,tsx,css,json}": [
-			"prettier --write",
-			"git add"
+			"prettier --write"
 		]
 	}
 }
