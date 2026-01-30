@@ -1,10 +1,21 @@
 import * as React from "react";
 import SettingsPanel from "./SettingsPanel";
 import { motion } from "framer-motion/dist/framer-motion";
+import { ActivePage, IgnoredError } from "../../types";
 
-function Navigation(props) {
-  const [panelVisible, setPanelVisible] = React.useState(false);
-  let activePage = props.activePage;
+interface NavigationProps {
+  activePage: ActivePage | "bulk";
+  ignoredErrorArray: IgnoredError[];
+  borderRadiusValues: number[];
+  lintVectors: boolean;
+  onPageSelection: (page: ActivePage | "bulk") => void;
+  updateLintRules: (boolean: boolean) => void;
+  onRefreshSelection: () => void;
+}
+
+function Navigation(props: NavigationProps) {
+  const [panelVisible, setPanelVisible] = React.useState<boolean>(false);
+  const activePage = props.activePage;
 
   const layersClick = () => {
     props.onPageSelection("layers");
@@ -23,21 +34,21 @@ function Navigation(props) {
       parent.postMessage(
         {
           pluginMessage: {
-            type: "update-styles-page"
-          }
+            type: "update-styles-page",
+          },
         },
-        "*"
+        "*",
       );
     }
 
     props.onPageSelection("styles");
   };
 
-  const handleLintRulesChange = boolean => {
+  const handleLintRulesChange = (boolean: boolean) => {
     props.updateLintRules(boolean);
   };
 
-  const handlePanelVisible = boolean => {
+  const handlePanelVisible = (boolean: boolean) => {
     setPanelVisible(boolean);
   };
 
@@ -81,7 +92,7 @@ function Navigation(props) {
           <div className="nav-icon-wrapper">
             <motion.button
               className="icon icon--refresh icon--button settings-button"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                 event.stopPropagation();
                 handleRefreshSelection();
               }}
@@ -91,7 +102,7 @@ function Navigation(props) {
             </motion.button>
             <motion.button
               className="icon icon--adjust icon--button settings-button"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                 event.stopPropagation();
                 handlePanelVisible(true);
               }}

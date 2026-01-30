@@ -1,15 +1,32 @@
 import * as React from "react";
-import StyleContent from "./StyleContent";
+import StyleListItemContent from "./StyleListItemContent";
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion/dist/framer-motion";
 import Button from "./Button";
 import SuggestionButton from "./SuggestionButton";
 import "../styles/modal.css";
+import { BulkError } from "../../types";
 
-function BulkErrorListItem(props) {
-  const ref = useRef();
-  const [menuState, setMenuState] = useState(false);
-  let error = props.error;
+interface BulkErrorListItemProps {
+  error: BulkError;
+  index: number;
+  handlePanelVisible: (visible: boolean) => void;
+  handleUpdatePanelError: (error: BulkError) => void;
+  handleUpdatePanelSuggestion: (index: number) => void;
+  handleIgnoreChange: (error: BulkError) => void;
+  handleSelectAll: (error: BulkError) => void;
+  handleSelect: (error: BulkError) => void;
+  handleIgnoreAll: (error: BulkError) => void;
+  handleFixAll: (error: BulkError) => void;
+  handleBorderRadiusUpdate: (value: string) => void;
+  handleCreateStyle: (error: BulkError) => void;
+  handleSuggestion: (error: BulkError, index: number) => void;
+}
+
+function BulkErrorListItem(props: BulkErrorListItemProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [menuState, setMenuState] = useState<boolean>(false);
+  const error = props.error;
 
   useOnClickOutside(ref, () => hideMenu());
 
@@ -21,37 +38,41 @@ function BulkErrorListItem(props) {
     setMenuState(false);
   };
 
-  function handlePanelVisible(boolean, error, index) {
+  function handlePanelVisible(
+    boolean: boolean,
+    error: BulkError,
+    index: number,
+  ) {
     props.handlePanelVisible(boolean);
     props.handleUpdatePanelError(error);
     props.handleUpdatePanelSuggestion(index);
   }
 
-  function handleIgnoreChange(error) {
+  function handleIgnoreChange(error: BulkError) {
     props.handleIgnoreChange(error);
   }
 
-  function handleSelectAll(error) {
+  function handleSelectAll(error: BulkError) {
     props.handleSelectAll(error);
   }
 
-  function handleSelect(error) {
+  function handleSelect(error: BulkError) {
     props.handleSelect(error);
   }
 
-  function handleIgnoreAll(error) {
+  function handleIgnoreAll(error: BulkError) {
     props.handleIgnoreAll(error);
   }
 
-  function handleFixAll(error) {
+  function handleFixAll(error: BulkError) {
     props.handleFixAll(error);
   }
 
-  function handleBorderRadiusUpdate(value) {
+  function handleBorderRadiusUpdate(value: string) {
     props.handleBorderRadiusUpdate(value);
   }
 
-  function handleCreateStyle(error) {
+  function handleCreateStyle(error: BulkError) {
     if (error.value !== "Mixed values") {
       props.handleCreateStyle(error);
     } else {
@@ -59,26 +80,26 @@ function BulkErrorListItem(props) {
         {
           pluginMessage: {
             type: "notify-user",
-            message: "Sorry! You can't create styles from mixed fill values."
-          }
+            message: "Sorry! You can't create styles from mixed fill values.",
+          },
         },
-        "*"
+        "*",
       );
     }
   }
 
-  function handleSuggestion(error, index) {
+  function handleSuggestion(error: BulkError, index: number) {
     props.handleSuggestion(error, index);
   }
 
-  function truncate(string) {
+  function truncate(string: string): string {
     return string.length > 46 ? string.substring(0, 46) + "..." : string;
   }
 
   const variants = {
     initial: { opacity: 0, y: -12, scale: 1 },
     enter: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: 12, scale: 1 }
+    exit: { opacity: 0, y: 12, scale: 1 },
   };
 
   const hasNoMatches = !error.matches || error.matches.length === 0;
@@ -100,9 +121,9 @@ function BulkErrorListItem(props) {
           className={`error-type error-background-${error.type.toLowerCase()}`}
         >
           <img
-            src={require("../assets/error-type/" +
-              error.type.toLowerCase() +
-              ".svg")}
+            src={require(
+              "../assets/error-type/" + error.type.toLowerCase() + ".svg",
+            )}
           />
         </span>
         <span className="error-description">
@@ -143,7 +164,7 @@ function BulkErrorListItem(props) {
             <li
               className="select-menu__list-item"
               key="list-item-1"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                 event.stopPropagation();
                 handleSelectAll(error);
                 hideMenu();
@@ -154,7 +175,7 @@ function BulkErrorListItem(props) {
             <li
               className="select-menu__list-item"
               key="list-item-3"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                 event.stopPropagation();
                 handleIgnoreAll(error);
                 hideMenu();
@@ -166,7 +187,7 @@ function BulkErrorListItem(props) {
               <li
                 className="select-menu__list-item select-menu__list-border"
                 key="list-item-create-style"
-                onClick={event => {
+                onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                   event.stopPropagation();
                   handleCreateStyle(error);
                   hideMenu();
@@ -179,7 +200,7 @@ function BulkErrorListItem(props) {
               <li
                 className="select-menu__list-item select-menu__list-border"
                 key="list-item-radius"
-                onClick={event => {
+                onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                   event.stopPropagation();
                   handleBorderRadiusUpdate(error.value);
                   hideMenu();
@@ -199,7 +220,7 @@ function BulkErrorListItem(props) {
             <li
               className="select-menu__list-item"
               key="list-item-1"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                 event.stopPropagation();
                 handleSelect(error);
                 hideMenu();
@@ -210,7 +231,7 @@ function BulkErrorListItem(props) {
             <li
               className="select-menu__list-item"
               key="list-item-2"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                 event.stopPropagation();
                 handleIgnoreChange(error);
                 hideMenu();
@@ -222,7 +243,7 @@ function BulkErrorListItem(props) {
               <li
                 className="select-menu__list-item select-menu__list-border"
                 key="list-item-create-style"
-                onClick={event => {
+                onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                   event.stopPropagation();
                   handleCreateStyle(error);
                   hideMenu();
@@ -235,7 +256,7 @@ function BulkErrorListItem(props) {
               <li
                 className="select-menu__list-item select-menu__list-border"
                 key="list-item-radius"
-                onClick={event => {
+                onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                   event.stopPropagation();
                   handleBorderRadiusUpdate(error.value);
                   hideMenu();
@@ -250,7 +271,7 @@ function BulkErrorListItem(props) {
       {error.matches && (
         <div className="auto-fix-content">
           <div className="auto-fix-style">
-            <StyleContent
+            <StyleListItemContent
               style={error.matches[0]}
               type={error.type.toLowerCase()}
               error={error}
@@ -265,12 +286,12 @@ function BulkErrorListItem(props) {
           <div className="auto-fix-suggestion">
             <div
               className="auto-fix-style auto-fix-style-clickable"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLDivElement>) => {
                 event.stopPropagation();
                 handlePanelVisible(true, error, 0);
               }}
             >
-              <StyleContent
+              <StyleListItemContent
                 style={error.suggestions[0]}
                 type={error.type.toLowerCase()}
                 error={error}
@@ -286,12 +307,12 @@ function BulkErrorListItem(props) {
             <div className="auto-fix-suggestion suggestion-last">
               <div
                 className="auto-fix-style auto-fix-style-clickable"
-                onClick={event => {
+                onClick={(event: React.MouseEvent<HTMLDivElement>) => {
                   event.stopPropagation();
                   handlePanelVisible(true, error, 1);
                 }}
               >
-                <StyleContent
+                <StyleListItemContent
                   style={error.suggestions[1]}
                   type={error.type.toLowerCase()}
                   error={error}
@@ -311,10 +332,13 @@ function BulkErrorListItem(props) {
 }
 
 // React hook click outside the component
-function useOnClickOutside(ref, handler) {
+function useOnClickOutside(
+  ref: React.RefObject<HTMLDivElement>,
+  handler: (event: MouseEvent | TouchEvent) => void,
+) {
   useEffect(() => {
-    const listener = event => {
-      if (!ref.current || ref.current.contains(event.target)) {
+    const listener = (event: MouseEvent | TouchEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
         return;
       }
       handler(event);

@@ -1,12 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion/dist/framer-motion";
+import { BulkError } from "../../types";
 
-const Modal = ({ isOpen, onClose, error }) => {
-  const [title, setTitle] = useState("");
-  const inputRef = useRef(); // Create a reference to the input element
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  error: BulkError | null;
+}
+
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, error }) => {
+  const [title, setTitle] = useState<string>("");
+  const inputRef = useRef<HTMLInputElement>(null); // Create a reference to the input element
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && inputRef.current) {
       // Focus the input element when the modal is opened
       inputRef.current.focus();
     }
@@ -18,10 +25,10 @@ const Modal = ({ isOpen, onClose, error }) => {
         pluginMessage: {
           type: "create-style",
           error: error,
-          title: title
-        }
+          title: title,
+        },
       },
-      "*"
+      "*",
     );
     setTitle("");
     onClose();
@@ -32,7 +39,7 @@ const Modal = ({ isOpen, onClose, error }) => {
     onClose();
   };
 
-  const handleKeyDown = event => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       handleSubmit();
     } else if (event.key === "Escape") {
@@ -57,7 +64,7 @@ const Modal = ({ isOpen, onClose, error }) => {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.5)"
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
             }}
             onClick={handleClose}
           />
@@ -71,13 +78,15 @@ const Modal = ({ isOpen, onClose, error }) => {
             style={{
               position: "fixed",
               top: "50%",
-              left: "50%"
+              left: "50%",
             }}
             className="modal-wrapper"
-            onClick={e => e.stopPropagation()}
+            onClick={(e: React.MouseEvent<HTMLDivElement>) =>
+              e.stopPropagation()
+            }
           >
             <h3 className="modal-title">Create Style</h3>
-            <p className="modal-subtitle">{error.value}</p>
+            <p className="modal-subtitle">{error?.value}</p>
             <div className="modal-close" onClick={handleClose}>
               <img
                 className="modal-close-icon"
@@ -89,7 +98,9 @@ const Modal = ({ isOpen, onClose, error }) => {
               ref={inputRef}
               type="text"
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setTitle(e.target.value)
+              }
               onKeyDown={handleKeyDown}
               placeholder={`Style Name`}
             />

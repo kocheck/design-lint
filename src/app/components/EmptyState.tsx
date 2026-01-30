@@ -1,7 +1,12 @@
 import * as React from "react";
 import { motion } from "framer-motion/dist/framer-motion";
 
-function EmptyState(props) {
+interface EmptyStateProps {
+  onHandleRunApp: () => void;
+  onScanEntirePage: () => void;
+}
+
+function EmptyState(props: EmptyStateProps) {
   const onRunApp = () => {
     props.onHandleRunApp();
   };
@@ -19,7 +24,7 @@ function EmptyState(props) {
       transition={{
         type: "spring",
         stiffness: 260,
-        damping: 20
+        damping: 20,
       }}
     >
       <div className="background-wrapper">

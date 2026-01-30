@@ -3,13 +3,23 @@ import { motion } from "framer-motion/dist/framer-motion";
 import PanelHeader from "./PanelHeader";
 import SettingsForm from "./SettingsForm";
 import "../styles/panel.css";
+import type { IgnoredError } from "../../types";
 
-function SettingsPanel(props) {
+interface SettingsPanelProps {
+  panelVisible: boolean;
+  onHandlePanelVisible: (visible: boolean) => void;
+  lintVectors: boolean;
+  updateLintRules: (value: boolean) => void;
+  ignoredErrorArray: IgnoredError[];
+  borderRadiusValues: number[];
+}
+
+function SettingsPanel(props: SettingsPanelProps) {
   const isVisible = props.panelVisible;
 
   const variants = {
     open: { opacity: 1, x: 0 },
-    closed: { opacity: 0, x: "100%" }
+    closed: { opacity: 0, x: "100%" },
   };
 
   function handleHide() {
@@ -29,10 +39,10 @@ function SettingsPanel(props) {
       {
         pluginMessage: {
           type: "update-storage-from-settings",
-          storageArray: []
-        }
+          storageArray: [],
+        },
       },
-      "*"
+      "*",
     );
     props.onHandlePanelVisible(false);
   }
@@ -57,7 +67,9 @@ function SettingsPanel(props) {
               to ignore, lock them 🔒 in the layer panel.
             </div>
           </div>
-          <SettingsForm borderRadiusValues={props.borderRadiusValues} />
+          <SettingsForm
+            borderRadiusValues={props.borderRadiusValues.join(", ")}
+          />
           <div className="settings-row">
             <h3 className="settings-title">Lint Vectors (Default Off)</h3>
             <div className="settings-label settings-no-padding">

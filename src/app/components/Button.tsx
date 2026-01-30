@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion/dist/framer-motion";
+import { BulkError } from "../../types";
 
-function Button({ error, applyStyle }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+interface ButtonProps {
+  error: BulkError;
+  applyStyle: (error: BulkError) => void;
+}
+
+function Button({ error, applyStyle }: ButtonProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return () => {
@@ -14,7 +20,7 @@ function Button({ error, applyStyle }) {
     };
   }, [timerId]);
 
-  const handleClick = error => {
+  const handleClick = (error: BulkError) => {
     if (!isLoading) {
       setIsLoading(true);
 

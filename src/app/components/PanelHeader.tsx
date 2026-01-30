@@ -1,7 +1,12 @@
 import * as React from "react";
 import { motion } from "framer-motion/dist/framer-motion";
 
-function PanelHeader(props) {
+interface PanelHeaderProps {
+  title: string;
+  handleHide: () => void;
+}
+
+function PanelHeader(props: PanelHeaderProps) {
   return (
     <div className="panel-header">
       <div className="panel-header__action">

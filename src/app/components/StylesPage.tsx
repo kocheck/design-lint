@@ -1,8 +1,13 @@
 import * as React from "react";
 import StyleListItem from "./StyleListItem";
+import { RemoteStyles } from "../../types";
 
-const StylesPage = ({ stylesInUse }) => {
-  const hasStylesInUse = stylesInUse && stylesInUse.length > 0;
+interface StylesPageProps {
+  stylesInUse: RemoteStyles | null;
+}
+
+const StylesPage: React.FC<StylesPageProps> = ({ stylesInUse }) => {
+  const hasStylesInUse = stylesInUse && stylesInUse.fills.length > 0;
 
   return (
     <div className="styles-overview-wrapper">
@@ -14,7 +19,7 @@ const StylesPage = ({ stylesInUse }) => {
         <div>
           <h4>Fill Styles</h4>
           <ul className="style-overview-list">
-            {stylesInUse.fills.map((style, index) => (
+            {stylesInUse.fills.map((style, index: number) => (
               <StyleListItem
                 style={style}
                 index={index}
@@ -24,7 +29,7 @@ const StylesPage = ({ stylesInUse }) => {
           </ul>
           <h4>Text Styles</h4>
           <ul className="style-overview-list">
-            {stylesInUse.text.map((style, index) => (
+            {stylesInUse.text.map((style, index: number) => (
               <StyleListItem
                 style={style}
                 index={index}
@@ -34,7 +39,7 @@ const StylesPage = ({ stylesInUse }) => {
           </ul>
           <h4>Effect Styles</h4>
           <ul className="style-overview-list">
-            {stylesInUse.effects.map((style, index) => (
+            {stylesInUse.effects.map((style, index: number) => (
               <StyleListItem
                 style={style}
                 index={index}
@@ -44,7 +49,7 @@ const StylesPage = ({ stylesInUse }) => {
           </ul>
           <h4>Stroke Styles</h4>
           <ul className="style-overview-list">
-            {stylesInUse.strokes.map((style, index) => (
+            {stylesInUse.strokes.map((style, index: number) => (
               <StyleListItem
                 style={style}
                 index={index}
