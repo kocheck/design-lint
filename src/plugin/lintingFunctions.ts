@@ -15,7 +15,16 @@ import type {
 // Generic function for creating an error object to pass to the app.
 export function createErrorObject(
   node: SceneNode,
-  type: "fill" | "text" | "stroke" | "radius" | "effects",
+  type:
+    | "fill"
+    | "text"
+    | "stroke"
+    | "radius"
+    | "effects"
+    | "spacing"
+    | "component"
+    | "naming"
+    | "nesting",
   message: string,
   value?: string,
   matches?: StyleMatch[],
@@ -1440,4 +1449,1161 @@ export function RGBToHex(r: number, g: number, b: number): string {
   if (bHex.length == 1) bHex = "0" + bHex;
 
   return "#" + rHex + gHex + bHex;
+}
+
+// ============================================
+// CUSTOM LINT RULES - BreakLine Design System
+// ============================================
+// These rules enforce BreakLine's design system standards.
+// Update the configuration values below with your actual
+// style keys and token values from your Figma files.
+
+// --------------------------------------------
+// CONFIGURATION - Update these values
+// --------------------------------------------
+
+/**
+ * Configuration for custom lint rules.
+ * To find style keys, run `figma.getLocalPaintStyles()` in the Figma console
+ * or use a plugin like "Inspector" to view style metadata.
+ */
+export const CUSTOM_LINT_CONFIG = {
+  // ========== COLOR TOKENS ==========
+  // Add your allowed fill style keys here.
+  // These are the "key" property from paint styles (without "S:" prefix).
+  // Run `figma.getLocalPaintStyles().forEach(s => console.log(s.key, s.name))` to get these.
+  allowedFillStyleKeys: [
+    // TODO: Add your style keys from figma.getLocalPaintStyles()
+    // Example: "4b93d40f61be15e255e87948a715521c3ae957e6", // color/primary/500
+  ] as string[],
+
+  // Colors that should NOT be used on text (background-only colors)
+  backgroundOnlyStyleKeys: [
+    // TODO: Add style keys for background colors that shouldn't appear on text
+    // Example: "abc123def456...", // color/background/surface
+  ] as string[],
+
+  // Colors that CAN be used on text
+  textColorStyleKeys: [
+    // TODO: Add style keys for text-appropriate colors
+    // Example: "abc123def456...", // color/text/primary
+  ] as string[],
+
+  // ========== TYPOGRAPHY TOKENS ==========
+  // Add your allowed text style keys here.
+  // Run `figma.getLocalTextStyles().forEach(s => console.log(s.key, s.name))` to get these.
+  allowedTextStyleKeys: [
+    // TODO: Add your style keys from figma.getLocalTextStyles()
+    // Example: "text-style-key-123", // typography/heading/h1
+  ] as string[],
+
+  // ========== SPACING VALUES ==========
+  // Allowed spacing values in pixels for auto-layout padding and gaps.
+  // These should match your design system's spacing scale.
+  allowedSpacingValues: [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128],
+
+  // ========== COMPONENT PATTERNS ==========
+  // Patterns that indicate a raw element should be a component instance.
+  // Key: description of what to look for, Value: component name to suggest.
+  componentPatterns: {
+    // Button-like patterns: rectangles with specific characteristics
+    button: {
+      description: "Button",
+      // Detect rectangles with specific sizing and rounded corners
+      minWidth: 80,
+      maxWidth: 400,
+      minHeight: 32,
+      maxHeight: 64,
+      hasText: true, // Should have text child
+    },
+    // Input-like patterns
+    input: {
+      description: "Input field",
+      minWidth: 120,
+      maxWidth: 600,
+      minHeight: 32,
+      maxHeight: 56,
+      hasBorder: true,
+    },
+    // Card-like patterns
+    card: {
+      description: "Card",
+      minWidth: 200,
+      minHeight: 100,
+      hasMultipleChildren: true,
+    },
+    // Avatar-like patterns: circles/ellipses at specific sizes
+    avatar: {
+      description: "Avatar",
+      sizes: [24, 32, 40, 48, 64, 80],
+      isCircle: true,
+    },
+  },
+
+  // ========== NAMING CONVENTIONS ==========
+  // Regex patterns for layer naming conventions.
+  namingPatterns: {
+    // Frames should use PascalCase or kebab-case with optional slashes
+    frame: /^[A-Z][a-zA-Z0-9]*(?:[\s/-][A-Za-z0-9]+)*$/,
+    // Components should use PascalCase
+    component: /^[A-Z][a-zA-Z0-9]*(?:\/[A-Z][a-zA-Z0-9]*)*$/,
+    // Text layers can be anything (usually the content itself)
+    text: null, // No restriction
+    // Instances should maintain component naming
+    instance: null, // No restriction
+    // Groups should be descriptive
+    group: /^[A-Za-z][a-zA-Z0-9\s\-_]*$/,
+    // Rectangles, ellipses should be descriptive (not "Rectangle 1")
+    shape:
+      /^(?!Rectangle\s*\d*$)(?!Ellipse\s*\d*$)(?!Star\s*\d*$)(?!Polygon\s*\d*$).+$/,
+  },
+
+  // Names that indicate placeholder/untouched layers
+  placeholderPatterns: [
+    /^Frame\s*\d*$/i,
+    /^Group\s*\d*$/i,
+    /^Rectangle\s*\d*$/i,
+    /^Ellipse\s*\d*$/i,
+    /^Vector\s*\d*$/i,
+    /^Star\s*\d*$/i,
+    /^Polygon\s*\d*$/i,
+    /^Line\s*\d*$/i,
+    /^Image\s*\d*$/i,
+  ],
+
+  // ========== NESTING LIMITS ==========
+  // Maximum recommended nesting depth for auto-layout frames.
+  // Beyond this depth, the rule will warn (not error).
+  maxAutoLayoutNestingDepth: 5,
+
+  // ========== ICON SIZES ==========
+  // Standard icon sizes in pixels
+  allowedIconSizes: [12, 16, 20, 24, 32, 40, 48],
+
+  // ========== TOUCH TARGETS ==========
+  // Minimum touch target size (Apple HIG recommends 44px, Material recommends 48px)
+  minTouchTargetSize: 44,
+
+  // Layer name patterns that indicate interactive elements
+  interactivePatterns: [
+    /button/i,
+    /btn/i,
+    /link/i,
+    /cta/i,
+    /clickable/i,
+    /tap/i,
+    /press/i,
+    /toggle/i,
+    /switch/i,
+    /checkbox/i,
+    /radio/i,
+    /icon-button/i,
+    /fab/i,
+    /chip/i,
+    /tag/i,
+  ],
+
+  // ========== FIXED DIMENSIONS ==========
+  // Minimum size to flag fixed dimensions (smaller elements are often intentionally fixed)
+  fixedDimensionMinSize: 100,
+
+  // ========== FEATURE FLAGS ==========
+  // Enable/disable specific rules
+  enableColorCheck: false, // Disabled - existing library-based rules handle this
+  enableTypographyCheck: false, // Disabled - existing library-based rules handle this
+  enableSpacingCheck: true,
+  enableComponentCheck: true,
+  enableNamingCheck: true,
+  enableNestingCheck: true,
+  enableFixedDimensionsCheck: true,
+  enableTouchTargetCheck: true,
+  enableEmptyFrameCheck: true,
+  enableDetachedInstanceCheck: true,
+  enableIconSizeCheck: true,
+};
+
+// --------------------------------------------
+// HELPER FUNCTIONS
+// --------------------------------------------
+
+/**
+ * Cleans a style ID by removing the "S:" prefix and any trailing data after comma.
+ * Figma style IDs come in format "S:abc123,optional-data"
+ * @param styleId - The raw style ID from Figma
+ * @returns The cleaned style key for comparison
+ */
+export function cleanStyleKey(styleId: string): string {
+  if (!styleId || typeof styleId !== "string") {
+    return "";
+  }
+  return styleId.replace("S:", "").split(",")[0];
+}
+
+/**
+ * Checks if a node has auto-layout enabled.
+ * @param node - The node to check
+ * @returns True if the node uses auto-layout
+ */
+export function hasAutoLayout(
+  node: SceneNode,
+): node is FrameNode | ComponentNode | InstanceNode {
+  return (
+    "layoutMode" in node &&
+    node.layoutMode !== "NONE" &&
+    node.layoutMode !== undefined
+  );
+}
+
+/**
+ * Gets the auto-layout nesting depth of a node by traversing up the tree.
+ * @param node - The node to check
+ * @returns The nesting depth (0 if not in auto-layout)
+ */
+export function getAutoLayoutDepth(node: SceneNode): number {
+  let depth = 0;
+  let current: BaseNode | null = node;
+
+  while (current && "parent" in current && current.parent) {
+    if (
+      current.parent.type === "FRAME" ||
+      current.parent.type === "COMPONENT" ||
+      current.parent.type === "INSTANCE"
+    ) {
+      const parent = current.parent as FrameNode | ComponentNode | InstanceNode;
+      if (parent.layoutMode && parent.layoutMode !== "NONE") {
+        depth++;
+      }
+    }
+    current = current.parent;
+  }
+
+  return depth;
+}
+
+/**
+ * Checks if a node has visible text children.
+ * @param node - The node to check
+ * @returns True if the node has text children
+ */
+function hasTextChildren(node: SceneNode): boolean {
+  if (!("children" in node)) {
+    return false;
+  }
+  return (node as ChildrenMixin).children.some(
+    (child) => child.type === "TEXT" && child.visible,
+  );
+}
+
+/**
+ * Checks if a node has visible strokes.
+ * @param node - The node to check
+ * @returns True if the node has visible strokes
+ */
+function hasVisibleStrokes(node: SceneNode): boolean {
+  if (!("strokes" in node)) {
+    return false;
+  }
+  const strokes = (node as MinimalStrokesMixin).strokes;
+  if (typeof strokes === "symbol" || !strokes.length) {
+    return false;
+  }
+  return strokes.some((stroke) => stroke.visible !== false);
+}
+
+/**
+ * Checks if a shape node is circular (equal width/height and has corner radius).
+ * @param node - The node to check
+ * @returns True if the node appears to be a circle
+ */
+function isCircular(node: SceneNode): boolean {
+  if (node.type === "ELLIPSE") {
+    return Math.abs(node.width - node.height) < 1;
+  }
+  if (
+    "cornerRadius" in node &&
+    typeof node.cornerRadius === "number" &&
+    node.cornerRadius > 0
+  ) {
+    const minDimension = Math.min(node.width, node.height);
+    return (
+      Math.abs(node.width - node.height) < 1 &&
+      node.cornerRadius >= minDimension / 2
+    );
+  }
+  return false;
+}
+
+// --------------------------------------------
+// RULE 1: COLOR TOKEN VALIDATION
+// --------------------------------------------
+
+/**
+ * Validates that text layers use appropriate color tokens.
+ * Flags text using background-only colors or unlisted fill styles.
+ * STRICT: All violations are flagged as errors.
+ *
+ * @param node - The Figma text node to check
+ * @param errors - Array to push errors to
+ */
+export function checkTextColorUsage(
+  node: SceneNode,
+  errors: LintError[],
+): void {
+  // Only run on text nodes
+  if (node.type !== "TEXT" || !CUSTOM_LINT_CONFIG.enableColorCheck) {
+    return;
+  }
+
+  // Skip invisible nodes
+  if (!node.visible) {
+    return;
+  }
+
+  const fillStyleId = node.fillStyleId;
+
+  // Handle mixed styles (multiple styles on one text layer)
+  if (typeof fillStyleId === "symbol") {
+    errors.push(
+      createErrorObject(
+        node,
+        "fill",
+        "Mixed fill styles on text",
+        "Text layer has multiple fill styles - consolidate to a single style",
+      ),
+    );
+    return;
+  }
+
+  // No style applied - this will be caught by the default fill checker
+  if (!fillStyleId || fillStyleId === "") {
+    return;
+  }
+
+  // Parse style key for comparison
+  const cleanKey = cleanStyleKey(fillStyleId);
+
+  // Skip if no background-only styles are configured
+  if (CUSTOM_LINT_CONFIG.backgroundOnlyStyleKeys.length === 0) {
+    return;
+  }
+
+  // Check if using a background-only color on text
+  if (CUSTOM_LINT_CONFIG.backgroundOnlyStyleKeys.includes(cleanKey)) {
+    errors.push(
+      createErrorObject(
+        node,
+        "fill",
+        "Background color on text",
+        "This color token is meant for backgrounds, not text. Use a text color token instead.",
+      ),
+    );
+    return;
+  }
+
+  // Optionally check if using any recognized style
+  if (
+    CUSTOM_LINT_CONFIG.textColorStyleKeys.length > 0 &&
+    !CUSTOM_LINT_CONFIG.textColorStyleKeys.includes(cleanKey) &&
+    !CUSTOM_LINT_CONFIG.allowedFillStyleKeys.includes(cleanKey)
+  ) {
+    errors.push(
+      createErrorObject(
+        node,
+        "fill",
+        "Unrecognized text color",
+        "This fill style is not in the design system's text color tokens.",
+      ),
+    );
+  }
+}
+
+// --------------------------------------------
+// RULE 2: TYPOGRAPHY STYLE VALIDATION
+// --------------------------------------------
+
+/**
+ * Validates that text layers use defined text styles from the design system.
+ * STRICT: All violations are flagged as errors.
+ *
+ * Note: The existing `checkType` function already handles missing text styles.
+ * This rule adds additional validation for custom text style requirements.
+ *
+ * @param node - The Figma text node to check
+ * @param errors - Array to push errors to
+ */
+export function checkTextStyleCompliance(
+  node: SceneNode,
+  errors: LintError[],
+): void {
+  // Only run on text nodes
+  if (node.type !== "TEXT" || !CUSTOM_LINT_CONFIG.enableTypographyCheck) {
+    return;
+  }
+
+  // Skip invisible nodes
+  if (!node.visible) {
+    return;
+  }
+
+  const textStyleId = node.textStyleId;
+
+  // Handle mixed text styles
+  if (typeof textStyleId === "symbol") {
+    errors.push(
+      createErrorObject(
+        node,
+        "text",
+        "Mixed text styles",
+        "Text layer has multiple text styles - use a single consistent style",
+      ),
+    );
+    return;
+  }
+
+  // If no text style is applied, defer to the existing checkType function
+  if (!textStyleId || textStyleId === "") {
+    return;
+  }
+
+  // If we have a configured allowlist, validate against it
+  if (CUSTOM_LINT_CONFIG.allowedTextStyleKeys.length > 0) {
+    const cleanKey = cleanStyleKey(textStyleId);
+
+    if (!CUSTOM_LINT_CONFIG.allowedTextStyleKeys.includes(cleanKey)) {
+      errors.push(
+        createErrorObject(
+          node,
+          "text",
+          "Non-standard text style",
+          "This text style is not in the approved design system typography scale.",
+        ),
+      );
+    }
+  }
+}
+
+// --------------------------------------------
+// RULE 3: SPACING/PADDING VALIDATION
+// --------------------------------------------
+
+/**
+ * Validates that auto-layout frames use standard spacing values.
+ * Checks padding (all sides) and gap spacing.
+ * STRICT: All non-standard values are flagged as errors.
+ *
+ * @param node - The Figma frame node to check
+ * @param errors - Array to push errors to
+ */
+export function checkSpacingValues(node: SceneNode, errors: LintError[]): void {
+  // Only run on frames/components with auto-layout
+  if (!CUSTOM_LINT_CONFIG.enableSpacingCheck) {
+    return;
+  }
+
+  if (!hasAutoLayout(node)) {
+    return;
+  }
+
+  // Skip invisible nodes
+  if (!node.visible) {
+    return;
+  }
+
+  const allowedValues = CUSTOM_LINT_CONFIG.allowedSpacingValues;
+
+  // Check if value is in allowed list (with small tolerance for floating point)
+  const isAllowedSpacing = (value: number): boolean => {
+    return allowedValues.some((allowed) => Math.abs(value - allowed) < 0.5);
+  };
+
+  // Collect all spacing violations for this node
+  const violations: string[] = [];
+
+  // Check gap (itemSpacing)
+  if (
+    "itemSpacing" in node &&
+    typeof node.itemSpacing === "number" &&
+    !isAllowedSpacing(node.itemSpacing)
+  ) {
+    violations.push(`Gap: ${node.itemSpacing}px`);
+  }
+
+  // Check padding - Figma uses individual padding properties
+  if ("paddingTop" in node) {
+    if (
+      typeof node.paddingTop === "number" &&
+      !isAllowedSpacing(node.paddingTop)
+    ) {
+      violations.push(`Top padding: ${node.paddingTop}px`);
+    }
+    if (
+      typeof node.paddingBottom === "number" &&
+      !isAllowedSpacing(node.paddingBottom)
+    ) {
+      violations.push(`Bottom padding: ${node.paddingBottom}px`);
+    }
+    if (
+      typeof node.paddingLeft === "number" &&
+      !isAllowedSpacing(node.paddingLeft)
+    ) {
+      violations.push(`Left padding: ${node.paddingLeft}px`);
+    }
+    if (
+      typeof node.paddingRight === "number" &&
+      !isAllowedSpacing(node.paddingRight)
+    ) {
+      violations.push(`Right padding: ${node.paddingRight}px`);
+    }
+  }
+
+  // If we found violations, create an error
+  if (violations.length > 0) {
+    const allowedStr = allowedValues.join(", ");
+    errors.push(
+      createErrorObject(
+        node,
+        "spacing",
+        "Non-standard spacing",
+        `${violations.join("; ")}. Use values from spacing scale: ${allowedStr}`,
+      ),
+    );
+  }
+}
+
+// --------------------------------------------
+// RULE 4: COMPONENT USAGE VALIDATION
+// --------------------------------------------
+
+/**
+ * Detects raw elements that should be component instances.
+ * Looks for common patterns (buttons, inputs, cards, avatars) built from primitives.
+ * STRICT: All matches are flagged as errors.
+ *
+ * @param node - The Figma node to check
+ * @param errors - Array to push errors to
+ */
+export function checkComponentUsage(
+  node: SceneNode,
+  errors: LintError[],
+): void {
+  // Skip if feature is disabled
+  if (!CUSTOM_LINT_CONFIG.enableComponentCheck) {
+    return;
+  }
+
+  // Skip instances (already using components), components themselves, and invisible nodes
+  if (node.type === "INSTANCE" || node.type === "COMPONENT" || !node.visible) {
+    return;
+  }
+
+  const patterns = CUSTOM_LINT_CONFIG.componentPatterns;
+
+  // Check for button-like patterns
+  if ((node.type === "FRAME" || node.type === "RECTANGLE") && patterns.button) {
+    const { minWidth, maxWidth, minHeight, maxHeight, hasText } =
+      patterns.button;
+
+    const isButtonSized =
+      node.width >= minWidth &&
+      node.width <= maxWidth &&
+      node.height >= minHeight &&
+      node.height <= maxHeight;
+
+    if (isButtonSized) {
+      // For frames, check if it has text children
+      if (node.type === "FRAME") {
+        if (!hasText || hasTextChildren(node)) {
+          errors.push(
+            createErrorObject(
+              node,
+              "component",
+              "Use Button component",
+              `This ${node.width}x${node.height}px frame with text looks like a button. Consider using a Button component from the library.`,
+            ),
+          );
+          return;
+        }
+      }
+    }
+  }
+
+  // Check for input-like patterns
+  if (node.type === "FRAME" && patterns.input) {
+    const { minWidth, maxWidth, minHeight, maxHeight, hasBorder } =
+      patterns.input;
+
+    const isInputSized =
+      node.width >= minWidth &&
+      node.width <= maxWidth &&
+      node.height >= minHeight &&
+      node.height <= maxHeight;
+
+    if (isInputSized && (!hasBorder || hasVisibleStrokes(node))) {
+      errors.push(
+        createErrorObject(
+          node,
+          "component",
+          "Use Input component",
+          `This ${node.width}x${node.height}px frame with border looks like an input field. Consider using an Input component.`,
+        ),
+      );
+      return;
+    }
+  }
+
+  // Check for card-like patterns
+  if (node.type === "FRAME" && patterns.card) {
+    const { minWidth, minHeight, hasMultipleChildren } = patterns.card;
+
+    const isCardSized = node.width >= minWidth && node.height >= minHeight;
+
+    if (isCardSized) {
+      const childCount = "children" in node ? node.children.length : 0;
+      if (!hasMultipleChildren || childCount >= 2) {
+        // Only flag if it has fill and multiple children (looks intentional)
+        const hasFill =
+          "fills" in node &&
+          typeof node.fills !== "symbol" &&
+          node.fills.length > 0 &&
+          node.fills.some((f) => f.visible !== false);
+
+        if (hasFill && childCount >= 3) {
+          errors.push(
+            createErrorObject(
+              node,
+              "component",
+              "Consider Card component",
+              `This ${node.width}x${node.height}px frame with ${childCount} children looks like a card. Consider using a Card component.`,
+            ),
+          );
+          return;
+        }
+      }
+    }
+  }
+
+  // Check for avatar-like patterns
+  if (
+    (node.type === "ELLIPSE" ||
+      node.type === "FRAME" ||
+      node.type === "RECTANGLE") &&
+    patterns.avatar
+  ) {
+    const { sizes } = patterns.avatar;
+
+    // Check if the node is circular and matches an avatar size
+    if (isCircular(node)) {
+      const nodeSize = Math.round(node.width);
+      const matchesAvatarSize = sizes.some(
+        (size) => Math.abs(nodeSize - size) < 2,
+      );
+
+      if (matchesAvatarSize) {
+        // Check if it has an image fill (common for avatars)
+        const hasImageFill =
+          "fills" in node &&
+          typeof node.fills !== "symbol" &&
+          node.fills.some((f) => f.type === "IMAGE");
+
+        if (hasImageFill) {
+          errors.push(
+            createErrorObject(
+              node,
+              "component",
+              "Use Avatar component",
+              `This ${nodeSize}px circular image looks like an avatar. Consider using an Avatar component.`,
+            ),
+          );
+        }
+      }
+    }
+  }
+}
+
+// --------------------------------------------
+// RULE 5: NAMING CONVENTION VALIDATION
+// --------------------------------------------
+
+/**
+ * Validates that layer names follow design system naming conventions.
+ * STRICT: All violations are flagged as errors.
+ *
+ * @param node - The Figma node to check
+ * @param errors - Array to push errors to
+ */
+export function checkNamingConventions(
+  node: SceneNode,
+  errors: LintError[],
+): void {
+  // Skip if feature is disabled
+  if (!CUSTOM_LINT_CONFIG.enableNamingCheck) {
+    return;
+  }
+
+  // Skip invisible nodes
+  if (!node.visible) {
+    return;
+  }
+
+  const name = node.name;
+  const patterns = CUSTOM_LINT_CONFIG.namingPatterns;
+  const placeholders = CUSTOM_LINT_CONFIG.placeholderPatterns;
+
+  // First check for placeholder/default names (applies to all types)
+  const isPlaceholder = placeholders.some((pattern) => pattern.test(name));
+
+  if (isPlaceholder) {
+    errors.push(
+      createErrorObject(
+        node,
+        "naming",
+        "Rename layer",
+        `"${name}" is a default Figma name. Give this layer a descriptive name that reflects its purpose.`,
+      ),
+    );
+    return;
+  }
+
+  // Type-specific naming validation
+  let pattern: RegExp | null = null;
+  let patternDescription = "";
+
+  switch (node.type) {
+    case "FRAME":
+      pattern = patterns.frame;
+      patternDescription = "PascalCase with optional separators (/ - space)";
+      break;
+    case "COMPONENT":
+    case "COMPONENT_SET":
+      pattern = patterns.component;
+      patternDescription = "PascalCase (e.g., Button, Card/Large)";
+      break;
+    case "GROUP":
+      pattern = patterns.group;
+      patternDescription = "Descriptive alphanumeric name";
+      break;
+    case "RECTANGLE":
+    case "ELLIPSE":
+    case "POLYGON":
+    case "STAR":
+    case "VECTOR":
+    case "LINE":
+      pattern = patterns.shape;
+      patternDescription = "Descriptive name (not default)";
+      break;
+    case "TEXT":
+      pattern = patterns.text;
+      break;
+    case "INSTANCE":
+      pattern = patterns.instance;
+      break;
+    default:
+      return;
+  }
+
+  // Validate against pattern if one is defined
+  if (pattern && !pattern.test(name)) {
+    errors.push(
+      createErrorObject(
+        node,
+        "naming",
+        "Naming convention",
+        `"${name}" doesn't follow naming conventions. Expected: ${patternDescription}`,
+      ),
+    );
+  }
+}
+
+// --------------------------------------------
+// RULE 6: NESTED AUTO-LAYOUT WARNING
+// --------------------------------------------
+
+/**
+ * Warns about excessive auto-layout nesting depth.
+ * LENIENT: Issues are flagged as warnings, not errors.
+ * Deep nesting can indicate overly complex component structures.
+ *
+ * @param node - The Figma node to check
+ * @param errors - Array to push errors to
+ */
+export function checkAutoLayoutNesting(
+  node: SceneNode,
+  errors: LintError[],
+): void {
+  // Skip if feature is disabled
+  if (!CUSTOM_LINT_CONFIG.enableNestingCheck) {
+    return;
+  }
+
+  // Only check frames with auto-layout
+  if (!hasAutoLayout(node)) {
+    return;
+  }
+
+  // Skip invisible nodes
+  if (!node.visible) {
+    return;
+  }
+
+  const depth = getAutoLayoutDepth(node);
+  const maxDepth = CUSTOM_LINT_CONFIG.maxAutoLayoutNestingDepth;
+
+  if (depth > maxDepth) {
+    errors.push(
+      createErrorObject(
+        node,
+        "nesting",
+        "Deep auto-layout nesting",
+        `This frame is nested ${depth} levels deep in auto-layout (max recommended: ${maxDepth}). Consider simplifying the structure or extracting into a component.`,
+      ),
+    );
+  }
+}
+
+// --------------------------------------------
+// RULE 7: FIXED DIMENSIONS CHECK
+// --------------------------------------------
+
+/**
+ * Flags frames with fixed dimensions that should likely use hug/fill constraints.
+ * Fixed dimensions often cause responsive issues when implemented in code.
+ * STRICT: All violations are flagged.
+ *
+ * @param node - The Figma node to check
+ * @param errors - Array to push errors to
+ */
+export function checkFixedDimensions(
+  node: SceneNode,
+  errors: LintError[],
+): void {
+  // Skip if feature is disabled
+  if (!CUSTOM_LINT_CONFIG.enableFixedDimensionsCheck) {
+    return;
+  }
+
+  // Only check frames with auto-layout
+  if (!hasAutoLayout(node)) {
+    return;
+  }
+
+  // Skip invisible nodes
+  if (!node.visible) {
+    return;
+  }
+
+  // Skip small elements (often intentionally fixed)
+  const minSize = CUSTOM_LINT_CONFIG.fixedDimensionMinSize;
+  if (node.width < minSize && node.height < minSize) {
+    return;
+  }
+
+  const issues: string[] = [];
+
+  // Check primary axis sizing
+  // In HORIZONTAL layout, width is primary axis
+  // In VERTICAL layout, height is primary axis
+  if (node.layoutMode === "HORIZONTAL") {
+    // Check if width is fixed when it could be hug/fill
+    if (
+      node.primaryAxisSizingMode === "FIXED" &&
+      node.width >= minSize &&
+      "children" in node &&
+      node.children.length > 0
+    ) {
+      issues.push(`Fixed width (${Math.round(node.width)}px)`);
+    }
+  } else if (node.layoutMode === "VERTICAL") {
+    // Check if height is fixed when it could be hug/fill
+    if (
+      node.primaryAxisSizingMode === "FIXED" &&
+      node.height >= minSize &&
+      "children" in node &&
+      node.children.length > 0
+    ) {
+      issues.push(`Fixed height (${Math.round(node.height)}px)`);
+    }
+  }
+
+  // Check counter axis sizing (perpendicular to layout direction)
+  if (node.layoutMode === "HORIZONTAL") {
+    if (
+      node.counterAxisSizingMode === "FIXED" &&
+      node.height >= minSize &&
+      "children" in node &&
+      node.children.length > 0
+    ) {
+      issues.push(`Fixed height (${Math.round(node.height)}px)`);
+    }
+  } else if (node.layoutMode === "VERTICAL") {
+    if (
+      node.counterAxisSizingMode === "FIXED" &&
+      node.width >= minSize &&
+      "children" in node &&
+      node.children.length > 0
+    ) {
+      issues.push(`Fixed width (${Math.round(node.width)}px)`);
+    }
+  }
+
+  if (issues.length > 0) {
+    errors.push(
+      createErrorObject(
+        node,
+        "fill", // Using 'fill' type as it relates to layout
+        "Fixed dimensions",
+        `${issues.join(", ")}. Consider using "Hug" or "Fill" for responsive layouts.`,
+      ),
+    );
+  }
+}
+
+// --------------------------------------------
+// RULE 8: TOUCH TARGET SIZE CHECK
+// --------------------------------------------
+
+/**
+ * Flags interactive elements that are smaller than the minimum touch target size.
+ * Apple HIG recommends 44x44px, Material Design recommends 48x48px.
+ * STRICT: All violations are flagged.
+ *
+ * @param node - The Figma node to check
+ * @param errors - Array to push errors to
+ */
+export function checkTouchTargetSize(
+  node: SceneNode,
+  errors: LintError[],
+): void {
+  // Skip if feature is disabled
+  if (!CUSTOM_LINT_CONFIG.enableTouchTargetCheck) {
+    return;
+  }
+
+  // Skip invisible nodes
+  if (!node.visible) {
+    return;
+  }
+
+  // Check if this looks like an interactive element based on name
+  const name = node.name.toLowerCase();
+  const isInteractive = CUSTOM_LINT_CONFIG.interactivePatterns.some((pattern) =>
+    pattern.test(name),
+  );
+
+  // Also check if it's an instance of a component that looks interactive
+  const isInteractiveInstance =
+    node.type === "INSTANCE" &&
+    CUSTOM_LINT_CONFIG.interactivePatterns.some((pattern) =>
+      pattern.test(name),
+    );
+
+  if (!isInteractive && !isInteractiveInstance) {
+    return;
+  }
+
+  const minSize = CUSTOM_LINT_CONFIG.minTouchTargetSize;
+  const width = Math.round(node.width);
+  const height = Math.round(node.height);
+
+  if (width < minSize || height < minSize) {
+    const issues: string[] = [];
+    if (width < minSize) issues.push(`width: ${width}px`);
+    if (height < minSize) issues.push(`height: ${height}px`);
+
+    errors.push(
+      createErrorObject(
+        node,
+        "radius", // Using 'radius' type as it relates to sizing
+        "Touch target too small",
+        `${issues.join(", ")} is below ${minSize}px minimum. Small touch targets are hard to tap on mobile.`,
+      ),
+    );
+  }
+}
+
+// --------------------------------------------
+// RULE 9: EMPTY FRAME CHECK
+// --------------------------------------------
+
+/**
+ * Flags frames that have no children.
+ * Empty frames are often forgotten placeholders or accidental creations.
+ * STRICT: All violations are flagged.
+ *
+ * @param node - The Figma node to check
+ * @param errors - Array to push errors to
+ */
+export function checkEmptyFrames(node: SceneNode, errors: LintError[]): void {
+  // Skip if feature is disabled
+  if (!CUSTOM_LINT_CONFIG.enableEmptyFrameCheck) {
+    return;
+  }
+
+  // Only check frames
+  if (node.type !== "FRAME") {
+    return;
+  }
+
+  // Skip invisible nodes
+  if (!node.visible) {
+    return;
+  }
+
+  // Check for empty children
+  if ("children" in node && node.children.length === 0) {
+    // Skip if it has a fill (might be intentional spacer or background)
+    const hasFill =
+      "fills" in node &&
+      typeof node.fills !== "symbol" &&
+      node.fills.length > 0 &&
+      node.fills.some((f) => f.visible !== false);
+
+    // Skip small frames that might be spacers
+    const isSpacer = node.width <= 32 && node.height <= 32;
+
+    if (!hasFill && !isSpacer) {
+      errors.push(
+        createErrorObject(
+          node,
+          "fill", // Using 'fill' type
+          "Empty frame",
+          `"${node.name}" has no children. Remove if unused or add content.`,
+        ),
+      );
+    }
+  }
+}
+
+// --------------------------------------------
+// RULE 10: DETACHED INSTANCE CHECK
+// --------------------------------------------
+
+/**
+ * Flags instances that have been detached from their main component.
+ * Detached instances break design system consistency and make updates harder.
+ * Note: This checks for frames that were likely instances based on naming patterns.
+ * STRICT: All violations are flagged.
+ *
+ * @param node - The Figma node to check
+ * @param errors - Array to push errors to
+ */
+export function checkDetachedInstances(
+  node: SceneNode,
+  errors: LintError[],
+): void {
+  // Skip if feature is disabled
+  if (!CUSTOM_LINT_CONFIG.enableDetachedInstanceCheck) {
+    return;
+  }
+
+  // Only check frames (detached instances become frames)
+  if (node.type !== "FRAME") {
+    return;
+  }
+
+  // Skip invisible nodes
+  if (!node.visible) {
+    return;
+  }
+
+  // Look for naming patterns that suggest this was a component instance
+  // Common patterns: "ComponentName", "Component / Variant", component naming conventions
+  const name = node.name;
+
+  // Check for component-like naming (PascalCase with optional slash variants)
+  const componentPattern = /^[A-Z][a-zA-Z0-9]*(?:\s*\/\s*[A-Z][a-zA-Z0-9]*)*$/;
+
+  // Check for common component prefixes/suffixes
+  const componentKeywords =
+    /^(Button|Card|Input|Modal|Dialog|Dropdown|Menu|Nav|Header|Footer|Sidebar|Avatar|Badge|Chip|Tag|Icon|Alert|Toast|Banner|Tooltip|Popover|Tab|Accordion|List|Table|Form|Field|Label|Checkbox|Radio|Switch|Toggle|Slider|Progress|Spinner|Skeleton|Divider|Spacer)/i;
+
+  if (componentPattern.test(name) && componentKeywords.test(name)) {
+    // Additional check: if it has the structure of a component (auto-layout, multiple children)
+    const hasAutoLayoutStructure =
+      "layoutMode" in node && node.layoutMode !== "NONE";
+    const hasMultipleChildren = "children" in node && node.children.length >= 1;
+
+    if (hasAutoLayoutStructure && hasMultipleChildren) {
+      errors.push(
+        createErrorObject(
+          node,
+          "component",
+          "Possibly detached instance",
+          `"${name}" looks like a detached component. Re-link to the library component for consistency.`,
+        ),
+      );
+    }
+  }
+}
+
+// --------------------------------------------
+// RULE 11: ICON SIZE CHECK
+// --------------------------------------------
+
+/**
+ * Flags icons that don't use standard sizes.
+ * Consistent icon sizing improves visual harmony and simplifies implementation.
+ * STRICT: All violations are flagged.
+ *
+ * @param node - The Figma node to check
+ * @param errors - Array to push errors to
+ */
+export function checkIconSize(node: SceneNode, errors: LintError[]): void {
+  // Skip if feature is disabled
+  if (!CUSTOM_LINT_CONFIG.enableIconSizeCheck) {
+    return;
+  }
+
+  // Skip invisible nodes
+  if (!node.visible) {
+    return;
+  }
+
+  // Detect icons by name pattern or node type
+  const name = node.name.toLowerCase();
+  const isIconByName =
+    name.includes("icon") ||
+    name.includes("ico-") ||
+    name.includes("ic-") ||
+    name.includes("ic_") ||
+    name.startsWith("icon/") ||
+    name.startsWith("icons/");
+
+  // Also check for vector nodes that might be icons (small, square-ish)
+  const isVectorIcon =
+    (node.type === "VECTOR" ||
+      node.type === "BOOLEAN_OPERATION" ||
+      node.type === "FRAME" ||
+      node.type === "INSTANCE") &&
+    Math.abs(node.width - node.height) < 4 && // Roughly square
+    node.width <= 64 && // Not too large
+    node.width >= 8; // Not too small
+
+  if (!isIconByName && !isVectorIcon) {
+    return;
+  }
+
+  // For icon detection by name, always check. For vector detection, be more lenient.
+  if (!isIconByName && !isVectorIcon) {
+    return;
+  }
+
+  const allowedSizes = CUSTOM_LINT_CONFIG.allowedIconSizes;
+  const width = Math.round(node.width);
+  const height = Math.round(node.height);
+
+  // Check if size matches allowed icon sizes (with 1px tolerance)
+  const isAllowedWidth = allowedSizes.some((s) => Math.abs(width - s) <= 1);
+  const isAllowedHeight = allowedSizes.some((s) => Math.abs(height - s) <= 1);
+
+  if (!isAllowedWidth || !isAllowedHeight) {
+    const allowedStr = allowedSizes.join(", ");
+    errors.push(
+      createErrorObject(
+        node,
+        "radius", // Using 'radius' type for sizing issues
+        "Non-standard icon size",
+        `${width}×${height}px is not a standard icon size. Use: ${allowedStr}px`,
+      ),
+    );
+  }
 }

@@ -7,7 +7,16 @@
 
 export interface LintError {
   message: string;
-  type: "fill" | "text" | "stroke" | "radius" | "effects";
+  type:
+    | "fill"
+    | "text"
+    | "stroke"
+    | "radius"
+    | "effects"
+    | "spacing"
+    | "component"
+    | "naming"
+    | "nesting";
   node: SceneNode;
   value: string;
   matches?: StyleMatch[];

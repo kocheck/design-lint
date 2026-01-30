@@ -8,6 +8,18 @@ import {
   gradientToCSS,
   // customCheckTextFills,
   // uncomment this as an example of a custom lint function ^
+  // ========== CUSTOM LINT RULES - BreakLine Design System ==========
+  checkTextColorUsage,
+  checkTextStyleCompliance,
+  checkSpacingValues,
+  checkComponentUsage,
+  checkNamingConventions,
+  checkAutoLayoutNesting,
+  checkFixedDimensions,
+  checkTouchTargetSize,
+  checkEmptyFrames,
+  checkDetachedInstances,
+  checkIconSize,
 } from "./lintingFunctions";
 
 import { fetchRemoteStyles, groupLibrary } from "./remoteStyleFunctions";
@@ -1713,6 +1725,13 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
       usedRemoteStyles,
     );
 
+    // ========== CUSTOM LINT RULES ==========
+    checkSpacingValues(node, errors);
+    checkAutoLayoutNesting(node, errors);
+    checkNamingConventions(node, errors);
+    checkFixedDimensions(node, errors);
+    checkIconSize(node, errors);
+
     return errors;
   }
 
@@ -1753,6 +1772,9 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
       usedRemoteStyles,
     );
 
+    // ========== CUSTOM LINT RULES ==========
+    checkNamingConventions(node, errors);
+
     return errors;
   }
 
@@ -1784,6 +1806,17 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
       usedRemoteStyles,
     );
 
+    // ========== CUSTOM LINT RULES ==========
+    checkSpacingValues(node, errors);
+    checkAutoLayoutNesting(node, errors);
+    checkNamingConventions(node, errors);
+    checkComponentUsage(node, errors);
+    checkFixedDimensions(node, errors);
+    checkEmptyFrames(node, errors);
+    checkDetachedInstances(node, errors);
+    checkTouchTargetSize(node, errors);
+    checkIconSize(node, errors);
+
     return errors;
   }
 
@@ -1804,6 +1837,9 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
     // For some reason section strokes aren't accessible via the API yet.
     // checkStrokes(node, errors);
     checkRadius(node, errors, borderRadiusArray);
+
+    // ========== CUSTOM LINT RULES ==========
+    checkNamingConventions(node, errors);
 
     return errors;
   }
@@ -1835,6 +1871,11 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
       localStylesLibrary,
       usedRemoteStyles,
     );
+
+    // ========== CUSTOM LINT RULES ==========
+    checkTextColorUsage(node, errors);
+    checkTextStyleCompliance(node, errors);
+    checkNamingConventions(node, errors);
 
     return errors;
   }
@@ -1868,6 +1909,12 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
       localStylesLibrary,
       usedRemoteStyles,
     );
+
+    // ========== CUSTOM LINT RULES ==========
+    checkNamingConventions(node, errors);
+    checkComponentUsage(node, errors);
+    checkTouchTargetSize(node, errors);
+    checkIconSize(node, errors);
 
     return errors;
   }
@@ -1904,6 +1951,11 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
       );
     }
 
+    // ========== CUSTOM LINT RULES ==========
+    // Naming conventions apply even when vector linting is disabled
+    checkNamingConventions(node, errors);
+    checkIconSize(node, errors);
+
     return errors;
   }
 
@@ -1935,6 +1987,11 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
       localStylesLibrary,
       usedRemoteStyles,
     );
+
+    // ========== CUSTOM LINT RULES ==========
+    checkNamingConventions(node, errors);
+    checkComponentUsage(node, errors);
+    checkIconSize(node, errors);
 
     return errors;
   }
