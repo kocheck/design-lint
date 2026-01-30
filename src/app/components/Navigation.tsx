@@ -122,7 +122,8 @@ function Navigation(props: NavigationProps) {
                 event.stopPropagation();
                 handleRefreshSelection();
               }}
-              title="Refresh selection"
+              data-tooltip="Refresh"
+              data-tooltip-position="bottom"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12.8426 8.94932C12.8426 9.7567 12.188 10.4113 11.3806 10.4113H1.8358L3.76073 8.48638L3.07162 7.79726L0.314802 10.5541C0.124558 10.7444 0.124558 11.0528 0.314802 11.2432L3.07162 14L3.76073 13.3109L1.8358 11.386H11.3806C12.7256 11.3843 13.8156 10.2944 13.8173 8.94932V7H12.8426V8.94932Z" fill="currentColor"/>
@@ -135,7 +136,8 @@ function Navigation(props: NavigationProps) {
                 event.stopPropagation();
                 handleAiPanelVisible(true);
               }}
-              title="AI Assistant - Design review and smart renaming"
+              data-tooltip="AI Assistant"
+              data-tooltip-position="bottom"
             >
               <span className="ai-icon">AI</span>
             </button>
@@ -145,7 +147,8 @@ function Navigation(props: NavigationProps) {
                 event.stopPropagation();
                 handlePanelVisible(true);
               }}
-              title="Settings - Configure lint rules and options"
+              data-tooltip="Settings"
+              data-tooltip-position="bottom"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M3.5 1V4M3.5 4C2.67157 4 2 4.67157 2 5.5C2 6.32843 2.67157 7 3.5 7C4.32843 7 5 6.32843 5 5.5C5 4.67157 4.32843 4 3.5 4ZM3.5 9V13M10.5 7V13M10.5 4C11.3284 4 12 3.32843 12 2.5C12 1.67157 11.3284 1 10.5 1C9.67157 1 9 1.67157 9 2.5C9 3.32843 9.67157 4 10.5 4ZM10.5 4V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>

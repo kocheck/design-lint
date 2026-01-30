@@ -98,7 +98,7 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
               onClick={() => removeLibrary(index)}
               className="icon icon--button library-remove tap-effect-small"
             >
-              <img src={require("../assets/subtract.svg")} />
+              <img className="library-icon" src={require("../assets/subtract.svg")} />
             </button>
           </li>
         ))}
@@ -109,7 +109,7 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
         >
           <div className="library-icon-wrapper">
             <img
-              className="library-icon"
+              className="library-icon library-icon--colored"
               src={require("../assets/add-blue.svg")}
             />
           </div>

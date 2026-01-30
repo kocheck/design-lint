@@ -108,6 +108,39 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Detect dark mode from Figma CSS variables and add class to document
+  useEffect(() => {
+    const detectDarkMode = () => {
+      const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--figma-color-bg').trim();
+      // Check if background is dark (Figma dark mode typically has dark backgrounds)
+      // Dark mode bg colors are typically like #2c2c2c, #1e1e1e, etc.
+      const isDark = bgColor && (
+        bgColor.startsWith('#1') ||
+        bgColor.startsWith('#2') ||
+        bgColor.startsWith('#3') ||
+        bgColor.includes('rgb') && parseInt(bgColor.split(',')[0].replace(/\D/g, '')) < 60
+      );
+
+      if (isDark) {
+        document.documentElement.classList.add('figma-dark');
+      } else {
+        document.documentElement.classList.remove('figma-dark');
+      }
+    };
+
+    // Run on mount
+    detectDarkMode();
+
+    // Also observe for changes (theme switches)
+    const observer = new MutationObserver(detectDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const updateSelectedList = useCallback((id: string) => {
     setSelectedListItem((prevItems) => {
       const newItems = [...prevItems];
