@@ -70,11 +70,22 @@ function ListItem({ style, index }: StyleListItemProps) {
           type={style.type.toLowerCase()}
           error={style}
         />
-        <img
+        <svg
           onClick={() => handleSelectAll(style.groupedConsumers || {})}
           className="overview-icon overview-content-select tap-effect-small"
-          src={require("../assets/select-all.svg")}
-        />
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M7.5 6V3.025C5.138 3.259 3.26 5.138 3.025 7.5H6V8.5H3.025C3.259 10.862 5.138 12.74 7.5 12.975V10H8.5V12.975C10.862 12.741 12.74 10.862 12.975 8.5H10V7.5H12.975C12.741 5.138 10.862 3.26 8.5 3.025V6H7.5ZM13.98 7.5C13.739 4.585 11.415 2.261 8.5 2.02V0H7.5V2.02C4.585 2.261 2.261 4.585 2.02 7.5H0V8.5H2.02C2.261 11.415 4.585 13.739 7.5 13.98V16H8.5V13.98C11.415 13.739 13.739 11.415 13.98 8.5H16V7.5H13.98Z"
+            fill="currentColor"
+          />
+        </svg>
       </div>
       <ul className="consumer-sublist">
         {style.groupedConsumers &&

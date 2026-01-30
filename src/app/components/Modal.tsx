@@ -80,10 +80,19 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, error }) => {
         <h3 className="modal-title">Create Style</h3>
         <p className="modal-subtitle">{error?.value}</p>
         <div className="modal-close" onClick={handleClose}>
-          <img
+          <svg
             className="modal-close-icon"
-            src={require("../assets/close.svg")}
-          />
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6 5.293l4.789-4.79.707.708-4.79 4.79 4.79 4.789-.707.707-4.79-4.79-4.789 4.79-.707-.707L5.293 6 .502 1.211 1.21.504 6 5.294z"
+              fill="currentColor"
+            />
+          </svg>
         </div>
         <input
           className="modal-input"

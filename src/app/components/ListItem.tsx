@@ -98,10 +98,15 @@ function ListItem(props: ListItemProps) {
       <div className="list-flex-row">
         <span className="list-arrow">
           {childNodes ? (
-            <img
+            <svg
               className="list-arrow-icon"
-              src={require("../assets/caret.svg")}
-            />
+              width="6"
+              height="6"
+              viewBox="0 0 6 6"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M3 5l3-4H0l3 4z" fill="currentColor" />
+            </svg>
           ) : null}
         </span>
         <span className="list-icon">

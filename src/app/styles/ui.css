@@ -118,6 +118,7 @@ button:focus {
   cursor: pointer;
   font-size: 18px;
   background: transparent;
+  color: var(--figma-color-text, #333);
 }
 
 .button--icon:hover {

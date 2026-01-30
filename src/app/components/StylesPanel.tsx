@@ -61,28 +61,48 @@ function StylesPanel(props: StylesPanelProps) {
                   </div>
                   <div className="comparison-row">
                     <div className="comparison-row-item">
-                      <img
+                      <svg
                         className="comparison-icon"
-                        src={require("../assets/line-height.svg")}
-                      />
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M14 1H0V0H14V1ZM14 14H0V13H14V14Z" fill="currentColor" />
+                        <path fillRule="evenodd" clipRule="evenodd" d="M3.548 11L6.348 3H7.652L10.452 11H9.498L8.798 9H5.202L4.502 11H3.548ZM7 3.862L8.448 8H5.552L7 3.862Z" fill="currentColor" />
+                      </svg>
                       <div className="comparison-value">
                         {error.textProperties.lineHeight}
                       </div>
                     </div>
                     <div className="comparison-row-item">
-                      <img
+                      <svg
                         className="comparison-icon"
-                        src={require("../assets/letter-spacing.svg")}
-                      />
+                        width="16"
+                        height="12"
+                        viewBox="0 0 16 12"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M0 12V0H1V12H0ZM15 12V0H16V12H15Z" fill="currentColor" />
+                        <path fillRule="evenodd" clipRule="evenodd" d="M4.548 10L7.348 2H8.652L11.452 10H10.498L9.798 8H6.202L5.502 10H4.548ZM8 2.862L9.448 7H6.552L8 2.862Z" fill="currentColor" />
+                      </svg>
                       <div className="comparison-value">
                         {error.textProperties.letterSpacingValue}
                       </div>
                     </div>
                     <div className="comparison-row-item">
-                      <img
+                      <svg
                         className="comparison-icon"
-                        src={require("../assets/paragraph-spacing.svg")}
-                      />
+                        width="14"
+                        height="16"
+                        viewBox="0 0 14 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M14 1H0V0H14V1ZM7 1.793L9.354 4.146L8.646 4.854L7.5 3.707V8.293L8.646 7.146L9.354 7.854L7 10.207L4.646 7.854L5.354 7.146L6.5 8.293V3.707L5.354 4.854L4.646 4.146L7 1.793ZM14 11V12H0V11H14ZM14 15V16H0V15H14Z" fill="currentColor" />
+                      </svg>
                       <div className="comparison-value">
                         {error.textProperties.paragraphSpacing}
                       </div>
@@ -148,10 +168,17 @@ function StylesPanel(props: StylesPanelProps) {
                   </div>
                   <div className="comparison-row">
                     <div className="comparison-row-item">
-                      <img
+                      <svg
                         className="comparison-icon"
-                        src={require("../assets/line-height.svg")}
-                      />
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M14 1H0V0H14V1ZM14 14H0V13H14V14Z" fill="currentColor" />
+                        <path fillRule="evenodd" clipRule="evenodd" d="M3.548 11L6.348 3H7.652L10.452 11H9.498L8.798 9H5.202L4.502 11H3.548ZM7 3.862L8.448 8H5.552L7 3.862Z" fill="currentColor" />
+                      </svg>
                       <div className="comparison-value">
                         {
                           (
@@ -168,10 +195,17 @@ function StylesPanel(props: StylesPanelProps) {
                       </div>
                     </div>
                     <div className="comparison-row-item">
-                      <img
+                      <svg
                         className="comparison-icon"
-                        src={require("../assets/letter-spacing.svg")}
-                      />
+                        width="16"
+                        height="12"
+                        viewBox="0 0 16 12"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M0 12V0H1V12H0ZM15 12V0H16V12H15Z" fill="currentColor" />
+                        <path fillRule="evenodd" clipRule="evenodd" d="M4.548 10L7.348 2H8.652L11.452 10H10.498L9.798 8H6.202L5.502 10H4.548ZM8 2.862L9.448 7H6.552L8 2.862Z" fill="currentColor" />
+                      </svg>
                       <div className="comparison-value">
                         {
                           (
@@ -188,10 +222,16 @@ function StylesPanel(props: StylesPanelProps) {
                       </div>
                     </div>
                     <div className="comparison-row-item">
-                      <img
+                      <svg
                         className="comparison-icon"
-                        src={require("../assets/paragraph-spacing.svg")}
-                      />
+                        width="14"
+                        height="16"
+                        viewBox="0 0 14 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M14 1H0V0H14V1ZM7 1.793L9.354 4.146L8.646 4.854L7.5 3.707V8.293L8.646 7.146L9.354 7.854L7 10.207L4.646 7.854L5.354 7.146L6.5 8.293V3.707L5.354 4.854L4.646 4.146L7 1.793ZM14 11V12H0V11H14ZM14 15V16H0V15H14Z" fill="currentColor" />
+                      </svg>
                       <div className="comparison-value">
                         {
                           error.suggestions[props.suggestion].textProperties
