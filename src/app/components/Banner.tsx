@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion/dist/framer-motion";
 
-function Banner({ totalErrorsWithMatches, handleFixAllErrors }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [timeoutId, setTimeoutId] = useState(null);
+interface BannerProps {
+  totalErrorsWithMatches: number;
+  handleFixAllErrors: () => void;
+}
+
+function Banner({ totalErrorsWithMatches, handleFixAllErrors }: BannerProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const handleClick = () => {
     if (!isLoading) {
@@ -29,7 +33,7 @@ function Banner({ totalErrorsWithMatches, handleFixAllErrors }) {
   }, [timeoutId]);
 
   return (
-    <div className="banner-wrapper">
+    <div className="banner-wrapper fade-slide-enter">
       <div className="banner">
         <span className={`error-type error-background-banner`}>
           <img src={require("../assets/sparkles.svg")} />
@@ -40,14 +44,13 @@ function Banner({ totalErrorsWithMatches, handleFixAllErrors }) {
             · ({totalErrorsWithMatches})
           </span>
         </span>
-        <motion.button
-          whileTap={{ scale: 0.98, opacity: 0.8 }}
+        <button
           onClick={handleClick}
-          className={
+          className={`tap-effect ${
             isLoading
               ? "loading-button disabled auto-fix-button"
               : "loading-button auto-fix-button"
-          }
+          }`}
         >
           {isLoading ? (
             <div className="button-loading-dots">
@@ -57,14 +60,10 @@ function Banner({ totalErrorsWithMatches, handleFixAllErrors }) {
             </div>
           ) : (
             <>
-              {/* <img
-                className="button-sparkles"
-                src={require("../assets/sparkles.svg")}
-              /> */}
               <span className="auto-fix-button-label">Fix All</span>
             </>
           )}
-        </motion.button>
+        </button>
       </div>
     </div>
   );

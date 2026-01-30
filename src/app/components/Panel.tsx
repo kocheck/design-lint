@@ -1,28 +1,39 @@
 import * as React from "react";
-import { motion } from "framer-motion/dist/framer-motion";
 
 import ErrorList from "./ErrorList";
 import PanelHeader from "./PanelHeader";
 import Preloader from "./Preloader";
 
 import "../styles/panel.css";
+import { LintError, NodeWithErrors, IgnoredError } from "../../types";
 
-function Panel(props) {
+interface PanelProps {
+  visibility: boolean;
+  node: { id: string; name: string };
+  errorArray: NodeWithErrors[];
+  ignoredErrors: IgnoredError[];
+  onClick: () => void;
+  onSelectedListUpdate: (id: string) => void;
+  onIgnoredUpdate: (error: LintError) => void;
+  onIgnoreAll: (errors: LintError[]) => void;
+}
+
+function Panel(props: PanelProps) {
   const isVisible = props.visibility;
   const node = props.node;
 
   // Reduce the size of our array of errors by removing
   // nodes with no errors on them.
-  let filteredErrorArray = props.errorArray.filter(
-    item => item.errors.length >= 1
+  const filteredErrorArray = props.errorArray.filter(
+    (item) => item.errors.length >= 1,
   );
 
-  filteredErrorArray.forEach(item => {
+  filteredErrorArray.forEach((item: NodeWithErrors) => {
     // Check each layer/node to see if an error that matches it's layer id
-    if (props.ignoredErrors.some(x => x.node.id === item.id)) {
+    if (props.ignoredErrors.some((x: IgnoredError) => x.node.id === item.id)) {
       // When we know a matching error exists loop over all the ignored
       // errors until we find it.
-      props.ignoredErrors.forEach(ignoredError => {
+      props.ignoredErrors.forEach((ignoredError: IgnoredError) => {
         if (ignoredError.node.id === item.id) {
           // Loop over every error this layer/node until we find the
           // error that should be ignored, then remove it.
@@ -37,20 +48,19 @@ function Panel(props) {
     }
   });
 
-  let activeId = props.errorArray.find(e => e.id === node.id);
-  let errors = [];
+  let activeId: NodeWithErrors | undefined = props.errorArray.find(
+    (e: NodeWithErrors) => e.id === node.id,
+  );
+  let errors: LintError[] = [];
   if (activeId !== undefined) {
     errors = activeId.errors;
   }
 
-  const variants = {
-    open: { opacity: 1, x: 0 },
-    closed: { opacity: 0, x: "100%" }
-  };
-
   function handlePrevNavigation() {
-    let currentIndex = filteredErrorArray.findIndex(
-      item => item.id === activeId.id
+    if (!activeId) return;
+
+    const currentIndex = filteredErrorArray.findIndex(
+      (item) => item.id === activeId!.id,
     );
     if (filteredErrorArray[currentIndex + 1] !== undefined) {
       activeId = filteredErrorArray[currentIndex + 1];
@@ -64,15 +74,17 @@ function Panel(props) {
 
     parent.postMessage(
       { pluginMessage: { type: "fetch-layer-data", id: activeId.id } },
-      "*"
+      "*",
     );
   }
 
   function handleNextNavigation() {
-    let currentIndex = filteredErrorArray.findIndex(
-      item => item.id === activeId.id
+    if (!activeId) return;
+
+    const currentIndex = filteredErrorArray.findIndex(
+      (item) => item.id === activeId!.id,
     );
-    let lastItem = currentIndex + filteredErrorArray.length - 1;
+    const lastItem = currentIndex + filteredErrorArray.length - 1;
 
     if (filteredErrorArray[currentIndex - 1] !== undefined) {
       activeId = filteredErrorArray[currentIndex - 1];
@@ -86,7 +98,7 @@ function Panel(props) {
 
     parent.postMessage(
       { pluginMessage: { type: "fetch-layer-data", id: activeId.id } },
-      "*"
+      "*",
     );
   }
 
@@ -96,15 +108,15 @@ function Panel(props) {
   }
 
   // Passes the ignored error back to it's parent.
-  function handleIgnoreChange(error) {
+  function handleIgnoreChange(error: LintError) {
     props.onIgnoredUpdate(error);
   }
 
-  function handleSelectAll(error) {
-    let nodesToBeSelected = [];
+  function handleSelectAll(error: LintError) {
+    const nodesToBeSelected: string[] = [];
 
-    filteredErrorArray.forEach(node => {
-      node.errors.forEach(item => {
+    filteredErrorArray.forEach((node: NodeWithErrors) => {
+      node.errors.forEach((item: LintError) => {
         if (item.value === error.value) {
           if (item.type === error.type) {
             nodesToBeSelected.push(item.node.id);
@@ -118,19 +130,19 @@ function Panel(props) {
         {
           pluginMessage: {
             type: "select-multiple-layers",
-            nodeArray: nodesToBeSelected
-          }
+            nodeArray: nodesToBeSelected,
+          },
         },
-        "*"
+        "*",
       );
     }
   }
 
-  function handleIgnoreAll(error) {
-    let errorsToBeIgnored = [];
+  function handleIgnoreAll(error: LintError) {
+    const errorsToBeIgnored: LintError[] = [];
 
-    filteredErrorArray.forEach(node => {
-      node.errors.forEach(item => {
+    filteredErrorArray.forEach((node: NodeWithErrors) => {
+      node.errors.forEach((item: LintError) => {
         if (item.value === error.value) {
           if (item.type === error.type) {
             errorsToBeIgnored.push(item);
@@ -148,11 +160,8 @@ function Panel(props) {
   return (
     <React.Fragment>
       {activeId !== undefined ? (
-        <motion.div
-          className={`panel`}
-          animate={isVisible ? "open" : "closed"}
-          transition={{ duration: 0.3, type: "tween" }}
-          variants={variants}
+        <div
+          className={`panel panel-slide ${isVisible ? "panel-open" : "panel-closed"}`}
         >
           <PanelHeader
             title={node.name}
@@ -172,12 +181,7 @@ function Panel(props) {
                 />
               </React.Fragment>
             ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 1, y: -10, scale: 0 }}
-                className="success-message"
-              >
+              <div className="success-message success-enter">
                 <div className="success-shape">
                   <img
                     className="success-icon"
@@ -185,7 +189,7 @@ function Panel(props) {
                   />
                 </div>
                 All errors fixed in the selection
-              </motion.div>
+              </div>
             )}
           </div>
 
@@ -206,18 +210,15 @@ function Panel(props) {
               Next →
             </button>
           </div>
-        </motion.div>
+        </div>
       ) : (
-        <motion.div
-          className={`panel`}
-          animate={isVisible ? "open" : "closed"}
-          transition={{ duration: 0.3, type: "tween" }}
-          variants={variants}
+        <div
+          className={`panel panel-slide ${isVisible ? "panel-open" : "panel-closed"}`}
         >
           <div className="name-wrapper">
             <Preloader />
           </div>
-        </motion.div>
+        </div>
       )}
       {isVisible ? (
         <div className="overlay" onClick={handleChange}></div>

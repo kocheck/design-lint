@@ -1,18 +1,40 @@
 import * as React from "react";
 import classNames from "classnames";
+import { NodeWithErrors, IgnoredError } from "../../types";
 
-function ListItem(props) {
+interface ListItemNode {
+  id: string;
+  name: string;
+  type: string;
+  children?: ListItemNode[];
+}
+
+interface ListItemProps {
+  node: ListItemNode;
+  errorArray: NodeWithErrors[];
+  ignoredErrorArray: IgnoredError[];
+  activeNodeIds: string[];
+  selectedListItems: string[];
+  onClick: (id: string) => void;
+}
+
+function ListItem(props: ListItemProps) {
   const { onClick } = props;
   const node = props.node;
-  let childNodes = null;
-  let errorObject = { errors: [] };
+  let childNodes: JSX.Element[] | null = null;
+  let errorObject: NodeWithErrors = { id: "", errors: [], children: [] };
   let childErrorsCount = 0;
 
-  let filteredErrorArray = props.errorArray;
+  const filteredErrorArray = props.errorArray;
 
   // Check to see if this node has corresponding errors.
-  if (filteredErrorArray.some(e => e.id === node.id)) {
-    errorObject = filteredErrorArray.find(e => e.id === node.id);
+  if (filteredErrorArray.some((e: NodeWithErrors) => e.id === node.id)) {
+    const foundError = filteredErrorArray.find(
+      (e: NodeWithErrors) => e.id === node.id,
+    );
+    if (foundError) {
+      errorObject = foundError;
+    }
   }
 
   // The component calls itself if there are children
@@ -20,8 +42,8 @@ function ListItem(props) {
     // Find errors in this node's children.
     childErrorsCount = findNestedErrors(node);
 
-    let reversedArray = node.children.slice().reverse();
-    childNodes = reversedArray.map(function(childNode) {
+    const reversedArray = node.children.slice().reverse();
+    childNodes = reversedArray.map(function (childNode: ListItemNode) {
       return (
         <ListItem
           ignoredErrorArray={props.ignoredErrorArray}
@@ -38,15 +60,19 @@ function ListItem(props) {
 
   // Recursive function for finding the amount of errors
   // nested within this nodes children.
-  function findNestedErrors(node) {
+  function findNestedErrors(node: ListItemNode): number {
     let errorCount = 0;
 
-    node.children.forEach(childNode => {
-      if (filteredErrorArray.some(e => e.id === childNode.id)) {
-        let childErrorObject = filteredErrorArray.find(
-          e => e.id === childNode.id
+    node.children?.forEach((childNode: ListItemNode) => {
+      if (
+        filteredErrorArray.some((e: NodeWithErrors) => e.id === childNode.id)
+      ) {
+        const childErrorObject = filteredErrorArray.find(
+          (e: NodeWithErrors) => e.id === childNode.id,
         );
-        errorCount = errorCount + childErrorObject.errors.length;
+        if (childErrorObject) {
+          errorCount = errorCount + childErrorObject.errors.length;
+        }
       }
 
       if (childNode.children) {
@@ -62,9 +88,9 @@ function ListItem(props) {
       id={node.id}
       className={classNames(`list-item`, {
         "list-item--active": props.activeNodeIds.includes(node.id),
-        "list-item--selected": props.selectedListItems.includes(node.id)
+        "list-item--selected": props.selectedListItems.includes(node.id),
       })}
-      onClick={event => {
+      onClick={(event: React.MouseEvent<HTMLLIElement>) => {
         event.stopPropagation();
         onClick(node.id);
       }}

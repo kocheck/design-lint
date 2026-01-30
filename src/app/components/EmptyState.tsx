@@ -1,7 +1,11 @@
 import * as React from "react";
-import { motion } from "framer-motion/dist/framer-motion";
 
-function EmptyState(props) {
+interface EmptyStateProps {
+  onHandleRunApp: () => void;
+  onScanEntirePage: () => void;
+}
+
+function EmptyState(props: EmptyStateProps) {
   const onRunApp = () => {
     props.onHandleRunApp();
   };
@@ -11,17 +15,7 @@ function EmptyState(props) {
   };
 
   return (
-    <motion.div
-      className="empty-state-wrapper"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -16 }}
-      transition={{
-        type: "spring",
-        stiffness: 260,
-        damping: 20
-      }}
-    >
+    <div className="empty-state-wrapper empty-state-enter">
       <div className="background-wrapper">
         <img
           className="empty-state-background"
@@ -46,7 +40,7 @@ function EmptyState(props) {
           Scan Entire Page
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

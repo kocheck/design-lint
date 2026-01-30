@@ -1,21 +1,32 @@
 import * as React from "react";
+import { StyleSuggestion, StyleMatch, BulkError } from "../../types";
 
-function truncateStyle(string) {
+function truncateStyle(string: string): string {
   return string.length > 40 ? string.substring(0, 40) + "..." : string;
 }
 
-const StyleContent = ({ style, type, error }) => {
+interface StyleContentProps {
+  style: StyleSuggestion | StyleMatch;
+  type: string;
+  error: BulkError | { fillColor?: string | null; paint?: Paint };
+}
+
+const StyleContent: React.FC<StyleContentProps> = ({ style, type, error }) => {
   const renderStylePreview = () => {
     switch (type) {
       case "fill":
-        if (error.fillColor) {
+        if ("fillColor" in error && error.fillColor) {
           return (
             <div
               className="style-preview fill-preview"
               style={{ background: error.fillColor }}
             ></div>
           );
-        } else if (error.paint.type === "IMAGE") {
+        } else if (
+          "paint" in error &&
+          error.paint &&
+          error.paint.type === "IMAGE"
+        ) {
           return (
             <div className="style-preview">
               <img
@@ -24,7 +35,11 @@ const StyleContent = ({ style, type, error }) => {
               />
             </div>
           );
-        } else if (error.paint.type === "VIDEO") {
+        } else if (
+          "paint" in error &&
+          error.paint &&
+          error.paint.type === "VIDEO"
+        ) {
           return (
             <div className="style-preview">
               <img
@@ -37,7 +52,10 @@ const StyleContent = ({ style, type, error }) => {
           return (
             <div
               className="style-preview fill-preview"
-              style={{ background: error.fillColor }}
+              style={{
+                background:
+                  ("fillColor" in error && error.fillColor) || undefined,
+              }}
             ></div>
           );
         }
@@ -45,33 +63,49 @@ const StyleContent = ({ style, type, error }) => {
         return (
           <div
             className="style-preview fill-preview"
-            style={{ background: error.fillColor }}
+            style={{
+              background:
+                ("fillColor" in error && error.fillColor) || undefined,
+            }}
           ></div>
         );
       case "text":
         return (
           <div className="style-preview text-preview">
-            <span style={{ fontWeight: style.style.fontStyle }}>Ag</span>
+            <span
+              style={{
+                fontWeight:
+                  ("textProperties" in style &&
+                    style.textProperties?.fontStyle) ||
+                  "normal",
+              }}
+            >
+              Ag
+            </span>
           </div>
         );
       case "effects":
         return (
           <div className="style-preview effect-preview">
-            <img
-              className="effect-icon"
-              src={getEffectIcon(style.effects[0].type)}
-              alt={style.effectType}
-            />
+            {"effects" in style && style.effects && style.effects[0] && (
+              <img
+                className="effect-icon"
+                src={getEffectIcon(style.effects[0].type)}
+                alt={style.effects[0].type}
+              />
+            )}
           </div>
         );
       case "effect":
         return (
           <div className="style-preview effect-preview">
-            <img
-              className="effect-icon"
-              src={getEffectIcon(style.effects[0].type)}
-              alt={style.effectType}
-            />
+            {"effects" in style && style.effects && style.effects[0] && (
+              <img
+                className="effect-icon"
+                src={getEffectIcon(style.effects[0].type)}
+                alt={style.effects[0].type}
+              />
+            )}
           </div>
         );
       default:
@@ -79,7 +113,7 @@ const StyleContent = ({ style, type, error }) => {
     }
   };
 
-  const getEffectIcon = effectType => {
+  const getEffectIcon = (effectType: string): string => {
     switch (effectType) {
       case "DROP_SHADOW":
         return require("../assets/drop-shadow.svg");

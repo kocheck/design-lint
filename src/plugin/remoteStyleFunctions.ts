@@ -1,6 +1,28 @@
 import { determineFill, gradientToCSS } from "./lintingFunctions";
+import type {
+  RemoteStyles,
+  RemoteFillStyle,
+  RemoteStrokeStyle,
+  RemoteTextStyle,
+  RemoteEffectStyle,
+} from "../types";
 
-export async function fetchRemoteStyles(usedRemoteStyles) {
+// Constants for chunked processing
+const CHUNK_SIZE = 50;
+const YIELD_INTERVAL_MS = 0;
+
+// Helper to yield to main thread
+const delay = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+interface StyleWithConsumers {
+  consumers: SceneNode[];
+  groupedConsumers?: Record<string, string[]>;
+}
+
+export async function fetchRemoteStyles(
+  usedRemoteStyles: RemoteStyles,
+): Promise<void> {
   const currentPage = figma.currentPage;
 
   const nodes = currentPage
@@ -13,10 +35,10 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
         "ELLIPSE",
         "INSTANCE",
         "VECTOR",
-        "LINE"
-      ]
+        "LINE",
+      ],
     })
-    .filter(node => {
+    .filter((node) => {
       // Check for remote styles
       return (
         node.fillStyleId ||
@@ -26,13 +48,21 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
       );
     });
 
-  for (const node of nodes) {
+  // Process nodes in chunks to prevent UI freezing
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+
+    // Yield to main thread every CHUNK_SIZE nodes
+    if (i > 0 && i % CHUNK_SIZE === 0) {
+      await delay(YIELD_INTERVAL_MS);
+    }
+
     if (node.fillStyleId) {
       const styleId = node.fillStyleId;
       if (typeof styleId !== "symbol") {
         // Check if the style with the given styleId already exists in the usedRemoteStyles.fills array
         const existingStyle = usedRemoteStyles.fills.find(
-          style => style.id === styleId
+          (style) => style.id === styleId,
         );
 
         if (existingStyle) {
@@ -41,20 +71,36 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
           existingStyle.consumers.push(node);
         } else {
           // If the style does not exist, create a new style object and push it to the usedRemoteStyles.fills array
-          const style = figma.getStyleById(styleId);
+          const style = (await figma.getStyleByIdAsync(
+            styleId,
+          )) as PaintStyle | null;
 
-          let currentFill = determineFill(node.fills);
-          let nodeFillType = node.fills[0].type;
-          let cssSyntax = null;
+          if (style === null) {
+            continue;
+          }
+
+          // Type guard for fills - ensure it's not mixed
+          const nodeFills = node.fills;
+          if (
+            typeof nodeFills === "symbol" ||
+            !nodeFills ||
+            nodeFills.length === 0
+          ) {
+            continue;
+          }
+
+          const currentFill = determineFill(nodeFills);
+          const nodeFillType = nodeFills[0].type;
+          let cssSyntax: string | null = null;
 
           if (nodeFillType === "SOLID") {
             cssSyntax = currentFill;
           } else if (
-            nodeFillType !== "SOLID" &&
             nodeFillType !== "VIDEO" &&
-            nodeFillType !== "IMAGE"
+            nodeFillType !== "IMAGE" &&
+            nodeFillType !== "PATTERN"
           ) {
-            cssSyntax = gradientToCSS(node.fills[0]);
+            cssSyntax = gradientToCSS(nodeFills[0]);
           }
 
           usedRemoteStyles.fills.push({
@@ -64,7 +110,7 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
             name: style.name,
             count: 1,
             consumers: [node],
-            fillColor: cssSyntax
+            fillColor: cssSyntax,
           });
         }
       }
@@ -75,7 +121,7 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
       if (typeof styleId !== "symbol") {
         // Check if the stroke style with the given styleId already exists in the usedRemoteStyles.strokes array
         const existingStyle = usedRemoteStyles.strokes.find(
-          style => style.id === styleId
+          (style: RemoteStrokeStyle) => style.id === styleId,
         );
 
         if (existingStyle) {
@@ -84,9 +130,15 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
           existingStyle.consumers.push(node);
         } else {
           // If the stroke style does not exist, create a new style object and push it to the usedRemoteStyles.strokes array
-          const style = figma.getStyleById(styleId);
+          const style = (await figma.getStyleByIdAsync(
+            styleId,
+          )) as PaintStyle | null;
 
-          let nodeFillType = style.paints[0].type;
+          if (style === null) {
+            continue;
+          }
+
+          const nodeFillType = style.paints[0].type;
           let cssSyntax = null;
 
           if (nodeFillType === "SOLID") {
@@ -102,7 +154,7 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
             name: style.name,
             count: 1,
             consumers: [node],
-            fillColor: cssSyntax
+            fillColor: cssSyntax,
           });
         }
       }
@@ -113,7 +165,7 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
       if (typeof styleId !== "symbol") {
         // Check if the text style with the given styleId already exists in the usedRemoteStyles.text array
         const existingStyle = usedRemoteStyles.text.find(
-          style => style.id === styleId
+          (style: RemoteTextStyle) => style.id === styleId,
         );
 
         if (existingStyle) {
@@ -122,7 +174,13 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
           existingStyle.consumers.push(node);
         } else {
           // If the text style does not exist, create a new style object and push it to the usedRemoteStyles.text array
-          const style = figma.getStyleById(styleId);
+          const style = (await figma.getStyleByIdAsync(
+            styleId,
+          )) as TextStyle | null;
+
+          if (style === null) {
+            continue;
+          }
 
           usedRemoteStyles.text.push({
             id: node.textStyleId,
@@ -141,11 +199,8 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
               paragraphIndent: style.paragraphIndent,
               paragraphSpacing: style.paragraphSpacing,
               fontFamily: style.fontName.family,
-              textAlignHorizontal: style.textAlignHorizontal,
-              textAlignVertical: style.textAlignVertical,
-              textAutoResize: style.textAutoResize,
-              textCase: style.textCase
-            }
+              textCase: style.textCase,
+            },
           });
         }
       }
@@ -156,7 +211,7 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
       if (typeof styleId !== "symbol") {
         // Check if the effect style with the given styleId already exists in the usedRemoteStyles.effects array
         const existingStyle = usedRemoteStyles.effects.find(
-          style => style.id === styleId
+          (style: RemoteEffectStyle) => style.id === styleId,
         );
 
         if (existingStyle) {
@@ -165,7 +220,13 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
           existingStyle.consumers.push(node);
         } else {
           // If the effect style does not exist, create a new style object and push it to the usedRemoteStyles.effects array
-          const style = figma.getStyleById(styleId);
+          const style = (await figma.getStyleByIdAsync(
+            styleId,
+          )) as EffectStyle | null;
+
+          if (style === null) {
+            continue;
+          }
 
           usedRemoteStyles.effects.push({
             id: node.effectStyleId,
@@ -173,7 +234,7 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
             effects: style.effects,
             name: style.name,
             count: 1,
-            consumers: [node]
+            consumers: [node],
           });
         }
       }
@@ -183,12 +244,14 @@ export async function fetchRemoteStyles(usedRemoteStyles) {
   // console.log("Remote styles:", usedRemoteStyles);
 }
 
-const groupConsumersByType = consumers => {
-  const groupedConsumers = {};
+const groupConsumersByType = (
+  consumers: SceneNode[],
+): Record<string, string[]> => {
+  const groupedConsumers: Record<string, string[]> = {};
 
-  consumers.forEach(consumer => {
-    let nodeType = consumer.type;
-    let nodeId = consumer.id;
+  consumers.forEach((consumer: SceneNode) => {
+    const nodeType = consumer.type;
+    const nodeId = consumer.id;
 
     if (!groupedConsumers[nodeType]) {
       groupedConsumers[nodeType] = [];
@@ -201,21 +264,25 @@ const groupConsumersByType = consumers => {
 };
 
 // Function to apply groupConsumersByType to the global styles library
-export const groupLibrary = globalStylesLibrary => {
+export const groupLibrary = (
+  globalStylesLibrary: RemoteStyles,
+): Record<string, unknown> => {
   return Object.fromEntries(
     Object.entries(globalStylesLibrary).map(([key, value]) => {
       // Check if the value is an array (i.e., styles)
       if (Array.isArray(value)) {
         // Apply the groupConsumersByType function to the styles
-        const stylesWithGroupedConsumers = value.map(style => {
-          const groupedConsumers = groupConsumersByType(style.consumers);
-          return { ...style, groupedConsumers };
-        });
+        const stylesWithGroupedConsumers = value.map(
+          (style: StyleWithConsumers) => {
+            const groupedConsumers = groupConsumersByType(style.consumers);
+            return { ...style, groupedConsumers };
+          },
+        );
         return [key, stylesWithGroupedConsumers];
       } else {
         // For non-array properties, copy the original value
         return [key, value];
       }
-    })
+    }),
   );
 };

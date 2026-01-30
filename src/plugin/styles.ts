@@ -1,18 +1,25 @@
 // Functions for getting styles from files.
-async function getLocalPaintStyles() {
-  const paintStyles = figma.getLocalPaintStyles();
-  const paintStylesData = paintStyles.map(style => ({
+
+import type {
+  LibraryStyle,
+  LibraryTextStyle,
+  LibraryEffectStyle,
+} from "../types";
+
+export async function getLocalPaintStyles(): Promise<LibraryStyle[]> {
+  const paintStyles = await figma.getLocalPaintStylesAsync();
+  const paintStylesData: LibraryStyle[] = paintStyles.map((style) => ({
     id: style.id,
     name: style.name,
-    paint: style.paints[0]
+    paint: style.paints[0],
   }));
 
   return paintStylesData;
 }
 
-async function getLocalTextStyles() {
-  const textStyles = figma.getLocalTextStyles();
-  const textStylesData = textStyles.map(style => ({
+export async function getLocalTextStyles(): Promise<LibraryTextStyle[]> {
+  const textStyles = await figma.getLocalTextStylesAsync();
+  const textStylesData: LibraryTextStyle[] = textStyles.map((style) => ({
     id: style.id,
     key: style.key,
     name: style.name,
@@ -24,37 +31,30 @@ async function getLocalTextStyles() {
       letterSpacing: style.letterSpacing,
       lineHeight: style.lineHeight,
       textDecoration: style.textDecoration,
-      textAlignHorizontal: style.textAlignHorizontal,
-      textAlignVertical: style.textAlignVertical,
-      textAutoResize: style.textAutoResize,
       paragraphIndent: style.paragraphIndent,
       paragraphSpacing: style.paragraphSpacing,
-      textCase: style.textCase
-    }
+      textCase: style.textCase,
+    },
   }));
 
   return textStylesData;
 }
 
-async function getLocalEffectStyles() {
-  const effectStyles = figma.getLocalEffectStyles();
-  const effectStylesData = effectStyles.map(style => ({
+export async function getLocalEffectStyles(): Promise<LibraryEffectStyle[]> {
+  const effectStyles = await figma.getLocalEffectStylesAsync();
+  const effectStylesData: LibraryEffectStyle[] = effectStyles.map((style) => ({
     id: style.id,
     name: style.name,
-    effects: style.effects
+    effects: style.effects,
   }));
 
   return effectStylesData;
 }
 
-async function saveToLocalStorage(data, fileName) {
+export async function saveToLocalStorage(
+  data: unknown,
+  fileName: string,
+): Promise<void> {
   console.log("set storage");
-  figma.clientStorage.setAsync(fileName, data);
+  await figma.clientStorage.setAsync(fileName, data);
 }
-
-module.exports = {
-  getLocalPaintStyles,
-  saveToLocalStorage,
-  getLocalTextStyles,
-  getLocalEffectStyles
-};

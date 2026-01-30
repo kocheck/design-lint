@@ -1,12 +1,23 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
+import { LintError } from "../../types";
 
-function ErrorListItem(props) {
-  const ref = useRef();
-  const [menuState, setMenuState] = useState(false);
-  let error = props.error;
+interface ErrorListItemProps {
+  error: LintError;
+  errorCount: number;
+  index: number;
+  handleIgnoreChange: (error: LintError) => void;
+  handleSelectAll: (error: LintError) => void;
+  handleIgnoreAll: (error: LintError) => void;
+}
 
-  useOnClickOutside(ref, () => hideMenu());
+function ErrorListItem(props: ErrorListItemProps) {
+  const listRef = useRef<HTMLLIElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuState, setMenuState] = useState<boolean>(false);
+  const error = props.error;
+
+  useOnClickOutside(listRef, () => hideMenu());
 
   const showMenu = () => {
     setMenuState(true);
@@ -16,26 +27,26 @@ function ErrorListItem(props) {
     setMenuState(false);
   };
 
-  function handleIgnoreChange(error) {
+  function handleIgnoreChange(error: LintError) {
     props.handleIgnoreChange(error);
   }
 
-  function handleSelectAll(error) {
+  function handleSelectAll(error: LintError) {
     props.handleSelectAll(error);
   }
 
-  function handleIgnoreAll(error) {
+  function handleIgnoreAll(error: LintError) {
     props.handleIgnoreAll(error);
   }
 
   return (
-    <li className="error-list-item" ref={ref} onClick={showMenu}>
+    <li className="error-list-item" ref={listRef} onClick={showMenu}>
       <div className="flex-row">
         <span className="error-type">
           <img
-            src={require("../assets/error-type/" +
-              error.type.toLowerCase() +
-              ".svg")}
+            src={require(
+              "../assets/error-type/" + error.type.toLowerCase() + ".svg",
+            )}
           />
         </span>
         <span className="error-description">
@@ -45,7 +56,7 @@ function ErrorListItem(props) {
           ) : null}
         </span>
         <span className="context-icon">
-          <div className="menu" ref={ref}>
+          <div className="menu" ref={menuRef}>
             <div className="menu-trigger" onClick={showMenu}>
               <img src={require("../assets/context.svg")} />
             </div>
@@ -62,7 +73,7 @@ function ErrorListItem(props) {
             <li
               className="select-menu__list-item"
               key="list-item-1"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                 event.stopPropagation();
                 handleSelectAll(error);
                 hideMenu();
@@ -73,7 +84,7 @@ function ErrorListItem(props) {
             <li
               className="select-menu__list-item"
               key="list-item-2"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                 event.stopPropagation();
                 handleIgnoreChange(error);
                 hideMenu();
@@ -84,7 +95,7 @@ function ErrorListItem(props) {
             <li
               className="select-menu__list-item"
               key="list-item-3"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                 event.stopPropagation();
                 handleIgnoreAll(error);
                 hideMenu();
@@ -103,7 +114,7 @@ function ErrorListItem(props) {
             <li
               className="select-menu__list-item"
               key="list-item-2"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                 event.stopPropagation();
                 handleIgnoreChange(error);
                 hideMenu();
@@ -114,7 +125,7 @@ function ErrorListItem(props) {
             <li
               className="select-menu__list-item"
               key="list-item-3"
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                 event.stopPropagation();
                 handleIgnoreAll(error);
                 hideMenu();
@@ -130,10 +141,13 @@ function ErrorListItem(props) {
 }
 
 // React hook click outside the component
-function useOnClickOutside(ref, handler) {
+function useOnClickOutside(
+  ref: React.RefObject<HTMLLIElement>,
+  handler: (event: MouseEvent | TouchEvent) => void,
+) {
   useEffect(() => {
-    const listener = event => {
-      if (!ref.current || ref.current.contains(event.target)) {
+    const listener = (event: MouseEvent | TouchEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
         return;
       }
       handler(event);

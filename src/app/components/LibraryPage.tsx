@@ -1,15 +1,23 @@
 import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion/dist/framer-motion";
 import "../styles/library.css";
+import type { Library } from "../../types";
 
-const LibraryPage = ({ libraries = [], onUpdateLibraries, localStyles }) => {
-  const hasLibraries = libraries && libraries.length > 0;
+interface LibraryPageProps {
+  libraries: Library[];
+  onUpdateLibraries: (libraries: Library[]) => void;
+  localStyles: { styles?: number } | Library;
+}
 
+const LibraryPage: React.FC<LibraryPageProps> = ({
+  libraries = [],
+  onUpdateLibraries,
+  localStyles,
+}) => {
   const onLibraryImport = () => {
     parent.postMessage({ pluginMessage: { type: "save-library" } }, "*");
   };
 
-  const removeLibrary = async index => {
+  const removeLibrary = (index: number) => {
     // Remove the library from the libraries array
     const updatedLibraries = [...libraries];
     updatedLibraries.splice(index, 1);
@@ -23,17 +31,11 @@ const LibraryPage = ({ libraries = [], onUpdateLibraries, localStyles }) => {
         pluginMessage: {
           type: "remove-library",
           index: index,
-          storageArray: updatedLibraries
-        }
+          storageArray: updatedLibraries,
+        },
       },
-      "*"
+      "*",
     );
-  };
-
-  const variants = {
-    initial: { opacity: 0, y: -12, scale: 1 },
-    enter: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: -12, scale: 1 }
   };
 
   return (
@@ -56,7 +58,7 @@ const LibraryPage = ({ libraries = [], onUpdateLibraries, localStyles }) => {
           <div className="library-list-item-content">
             <h3 className="item-content-title">Local Styles</h3>
             <span className="item-content-styles">
-              {localStyles.styles} styles
+              {localStyles.styles ?? 0} styles
             </span>
           </div>
         </li>
@@ -74,58 +76,45 @@ const LibraryPage = ({ libraries = [], onUpdateLibraries, localStyles }) => {
       </div>
 
       <ul className="library-list">
-        <AnimatePresence mode="popLayout">
-          {libraries.map((library, index) => (
-            <motion.li
-              className="library-list-item"
-              key={index}
-              positionTransition
-              variants={variants}
-              initial="initial"
-              animate="enter"
-              exit="exit"
-            >
-              <div className="library-icon-wrapper">
-                <img
-                  className="library-icon"
-                  src={require("../assets/library.svg")}
-                />
-              </div>
-              <div className="library-list-item-content">
-                <h3 className="item-content-title">{library.name}</h3>
-                <span className="item-content-styles">
-                  {library.styles} styles
-                </span>
-              </div>
-              <motion.button
-                onClick={() => removeLibrary(index)}
-                className="icon icon--button library-remove"
-                whileTap={{ scale: 0.9, opacity: 0.8 }}
-              >
-                <img src={require("../assets/subtract.svg")} />
-              </motion.button>
-            </motion.li>
-          ))}
-          <motion.li
-            className="library-list-item save-library"
-            key="import"
-            positionTransition
-            onClick={onLibraryImport}
-            whileTap={{ scale: 0.98, opacity: 0.8 }}
-            variants={variants}
-            initial="enter"
-            animate="enter"
-            exit="exit"
+        {libraries.map((library, index) => (
+          <li
+            className="library-list-item list-item-enter"
+            key={index}
+            style={{ animationDelay: `${index * 50}ms` }}
           >
             <div className="library-icon-wrapper">
               <img
                 className="library-icon"
-                src={require("../assets/add-blue.svg")}
+                src={require("../assets/library.svg")}
               />
             </div>
-            <h3 className="save-library-label">Save Library</h3>
-          </motion.li>
-        </AnimatePresence>
+            <div className="library-list-item-content">
+              <h3 className="item-content-title">{library.name}</h3>
+              <span className="item-content-styles">
+                {library.styles} styles
+              </span>
+            </div>
+            <button
+              onClick={() => removeLibrary(index)}
+              className="icon icon--button library-remove tap-effect-small"
+            >
+              <img src={require("../assets/subtract.svg")} />
+            </button>
+          </li>
+        ))}
+        <li
+          className="library-list-item save-library tap-effect"
+          key="import"
+          onClick={onLibraryImport}
+        >
+          <div className="library-icon-wrapper">
+            <img
+              className="library-icon"
+              src={require("../assets/add-blue.svg")}
+            />
+          </div>
+          <h3 className="save-library-label">Save Library</h3>
+        </li>
       </ul>
     </div>
   );

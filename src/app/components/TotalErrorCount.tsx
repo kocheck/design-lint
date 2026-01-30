@@ -1,12 +1,17 @@
 import * as React from "react";
+import { NodeWithErrors } from "../../types";
 
-function TotalErrorCount(props) {
-  let totalErrorCount = determineCount(props.errorArray);
+interface TotalErrorCountProps {
+  errorArray: NodeWithErrors[];
+}
 
-  function determineCount(array) {
+function TotalErrorCount(props: TotalErrorCountProps) {
+  const totalErrorCount = determineCount(props.errorArray);
+
+  function determineCount(array: NodeWithErrors[]): number {
     let count = 0;
 
-    array.forEach(arrayItem => {
+    array.forEach((arrayItem: NodeWithErrors) => {
       if (arrayItem.errors) {
         count = count + arrayItem.errors.length;
       }

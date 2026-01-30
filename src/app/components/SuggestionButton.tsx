@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion/dist/framer-motion";
+import { BulkError } from "../../types";
 
-function SuggestionButton({ error, index, applyStyle }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+interface SuggestionButtonProps {
+  error: BulkError;
+  index: number;
+  applyStyle: (error: BulkError, index: number) => void;
+}
+
+function SuggestionButton({ error, index, applyStyle }: SuggestionButtonProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return () => {
@@ -14,7 +20,7 @@ function SuggestionButton({ error, index, applyStyle }) {
     };
   }, [timerId]);
 
-  const handleClick = (error, index) => {
+  const handleClick = (error: BulkError, index: number) => {
     if (!isLoading) {
       setIsLoading(true);
 
@@ -28,14 +34,13 @@ function SuggestionButton({ error, index, applyStyle }) {
   };
 
   return (
-    <motion.button
-      whileTap={{ scale: 0.98, opacity: 0.8 }}
+    <button
       onClick={() => handleClick(error, index)}
-      className={
+      className={`tap-effect ${
         isLoading
           ? "loading-button disabled match-button"
           : "loading-button match-button"
-      }
+      }`}
     >
       {isLoading ? (
         <div className="button-loading-dots match-button-loading">
@@ -46,7 +51,7 @@ function SuggestionButton({ error, index, applyStyle }) {
       ) : (
         <>Apply</>
       )}
-    </motion.button>
+    </button>
   );
 }
 

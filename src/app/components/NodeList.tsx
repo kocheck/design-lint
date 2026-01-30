@@ -1,22 +1,46 @@
 import * as React from "react";
-import { motion } from "framer-motion/dist/framer-motion";
 
 import ListItem from "./ListItem";
 import TotalErrorCount from "./TotalErrorCount";
+import { NodeWithErrors, IgnoredError } from "../../types";
 
-function NodeList(props) {
+interface NodeListProps {
+  errorArray: NodeWithErrors[];
+  ignoredErrorArray: IgnoredError[];
+  activeNodeIds: string[];
+  selectedListItems: string[];
+  visibility: boolean;
+  nodeArray: Array<{
+    id: string;
+    name: string;
+    type: string;
+    children?: Array<{
+      id: string;
+      name: string;
+      type: string;
+      children?: any[];
+    }>;
+  }>;
+  onErrorUpdate: (node: NodeWithErrors) => void;
+  onVisibleUpdate: (visible: boolean) => void;
+  onSelectedListUpdate: (id: string) => void;
+}
+
+function NodeList(props: NodeListProps) {
   // Reduce the size of our array of errors by removing
   // nodes with no errors on them.
-  let filteredErrorArray = props.errorArray.filter(
-    item => item.errors.length >= 1
+  const filteredErrorArray = props.errorArray.filter(
+    (item) => item.errors.length >= 1,
   );
 
-  filteredErrorArray.forEach(item => {
+  filteredErrorArray.forEach((item: NodeWithErrors) => {
     // Check each layer/node to see if an error that matches it's layer id
-    if (props.ignoredErrorArray.some(x => x.node.id === item.id)) {
+    if (
+      props.ignoredErrorArray.some((x: IgnoredError) => x.node.id === item.id)
+    ) {
       // When we know a matching error exists loop over all the ignored
       // errors until we find it.
-      props.ignoredErrorArray.forEach(ignoredError => {
+      props.ignoredErrorArray.forEach((ignoredError: IgnoredError) => {
         if (ignoredError.node.id === item.id) {
           // Loop over every error this layer/node until we find the
           // error that should be ignored, then remove it.
@@ -31,15 +55,15 @@ function NodeList(props) {
     }
   });
 
-  const handleNodeClick = id => {
+  const handleNodeClick = (id: string) => {
     // Opens the panel if theres an error.
-    let activeId = props.errorArray.find(e => e.id === id);
+    const activeId = props.errorArray.find((e: NodeWithErrors) => e.id === id);
 
-    if (activeId.errors.length) {
+    if (activeId && activeId.errors.length) {
       // Pass the plugin the ID of the layer we want to fetch.
       parent.postMessage(
         { pluginMessage: { type: "fetch-layer-data", id: id } },
-        "*"
+        "*",
       );
 
       props.onErrorUpdate(activeId);
@@ -60,9 +84,9 @@ function NodeList(props) {
   };
 
   if (props.nodeArray.length) {
-    let nodes = props.nodeArray;
+    const nodes = props.nodeArray;
 
-    const listItems = nodes.map(node => (
+    const listItems = nodes.map((node: (typeof nodes)[0]) => (
       <ListItem
         ignoredErrorArray={props.ignoredErrorArray}
         activeNodeIds={props.activeNodeIds}
@@ -74,21 +98,8 @@ function NodeList(props) {
       />
     ));
 
-    const variants = {
-      initial: { opacity: 1, y: 0 },
-      enter: { opacity: 1, y: 0 },
-      exit: { opacity: 1, y: 0 }
-    };
-
     return (
-      <motion.div
-        className="page"
-        key="node-list"
-        variants={variants}
-        initial="initial"
-        animate="enter"
-        exit="exit"
-      >
+      <div className="page page-enter" key="node-list">
         <ul className="list">{listItems}</ul>
         <div className="footer">
           <TotalErrorCount errorArray={filteredErrorArray} />
@@ -96,7 +107,7 @@ function NodeList(props) {
             <button
               className="button button--primary button--flex"
               disabled={filteredErrorArray.length === 0}
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                 event.stopPropagation();
                 handleOpenFirstError();
               }}
@@ -105,7 +116,7 @@ function NodeList(props) {
             </button>
           </div>
         </div>
-      </motion.div>
+      </div>
     );
   } else {
     return (

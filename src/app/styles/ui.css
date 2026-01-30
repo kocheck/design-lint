@@ -606,3 +606,211 @@ body {
   margin-top: 8px;
   margin-bottom: -4px;
 }
+
+/* ========================================
+   CSS Animations (replacing framer-motion)
+   ======================================== */
+
+/* Tap/click effect for interactive elements */
+.tap-effect {
+  transition:
+    transform 100ms ease,
+    opacity 100ms ease;
+}
+
+.tap-effect:active {
+  transform: scale(0.98);
+  opacity: 0.8;
+}
+
+.tap-effect-small:active {
+  transform: scale(0.9);
+  opacity: 0.8;
+}
+
+/* Page enter/exit animations */
+.page-enter {
+  animation: pageEnter 200ms ease-out forwards;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Panel slide animations */
+.panel-slide {
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+
+.panel-slide.panel-open {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.panel-slide.panel-closed {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+/* List item animations */
+.list-item-enter {
+  animation: listItemEnter 200ms ease-out forwards;
+}
+
+@keyframes listItemEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger animation delays for list items */
+.list-item-enter:nth-child(1) {
+  animation-delay: 0ms;
+}
+.list-item-enter:nth-child(2) {
+  animation-delay: 30ms;
+}
+.list-item-enter:nth-child(3) {
+  animation-delay: 60ms;
+}
+.list-item-enter:nth-child(4) {
+  animation-delay: 90ms;
+}
+.list-item-enter:nth-child(5) {
+  animation-delay: 120ms;
+}
+.list-item-enter:nth-child(n + 6) {
+  animation-delay: 150ms;
+}
+
+/* Banner/success message animation */
+.fade-slide-enter {
+  animation: fadeSlideEnter 200ms ease-out forwards;
+}
+
+@keyframes fadeSlideEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal animations */
+.modal-backdrop {
+  animation: modalBackdropEnter 200ms ease-out forwards;
+}
+
+@keyframes modalBackdropEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  animation: modalContentEnter 200ms ease-out forwards;
+}
+
+@keyframes modalContentEnter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Success message animation */
+.success-enter {
+  animation: successEnter 300ms ease-out forwards;
+}
+
+@keyframes successEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Empty state animation */
+.empty-state-enter {
+  animation: emptyStateEnter 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes emptyStateEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Preloader animation */
+.preloader-enter {
+  animation: preloaderEnter 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes preloaderEnter {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.preloader-circle {
+  animation: preloaderBounce 600ms ease-in-out infinite alternate;
+}
+
+.preloader-circle:nth-child(1) {
+  animation-delay: 0ms;
+}
+.preloader-circle:nth-child(2) {
+  animation-delay: 150ms;
+}
+.preloader-circle:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes preloaderBounce {
+  from {
+    transform: scale(0.8) translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1) translateY(-4px);
+    opacity: 0.8;
+  }
+}

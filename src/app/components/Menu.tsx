@@ -1,9 +1,20 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
+import { LintError } from "../../types";
 
-function Menu(props) {
-  const ref = useRef();
-  const [menuState, setMenuState] = useState(false);
+interface MenuItem {
+  label: string;
+  event: (error: LintError) => void;
+}
+
+interface MenuProps {
+  menuItems: MenuItem[];
+  error: LintError;
+}
+
+function Menu(props: MenuProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [menuState, setMenuState] = useState<boolean>(false);
 
   useOnClickOutside(ref, () => hideMenu());
 
@@ -26,12 +37,12 @@ function Menu(props) {
           (menuState ? "select-menu__list--active" : "")
         }
       >
-        {props.menuItems.map((item, i) => {
+        {props.menuItems.map((item: MenuItem, i: number) => {
           return (
             <li
               className="select-menu__list-item"
               key={i}
-              onClick={event => {
+              onClick={(event: React.MouseEvent<HTMLLIElement>) => {
                 event.stopPropagation();
                 item.event(props.error);
                 hideMenu();
@@ -47,10 +58,13 @@ function Menu(props) {
 }
 
 // React hook click outside the component
-function useOnClickOutside(ref, handler) {
+function useOnClickOutside(
+  ref: React.RefObject<HTMLDivElement>,
+  handler: (event: MouseEvent | TouchEvent) => void,
+) {
   useEffect(() => {
-    const listener = event => {
-      if (!ref.current || ref.current.contains(event.target)) {
+    const listener = (event: MouseEvent | TouchEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
         return;
       }
       handler(event);

@@ -1,10 +1,14 @@
 import * as React from "react";
 import { useState } from "react";
 
-function SettingsForm(props) {
+interface SettingsFormProps {
+  borderRadiusValues: string;
+}
+
+function SettingsForm(props: SettingsFormProps) {
   const [radiusValue, setRadiusValue] = useState("");
 
-  const handleSubmit = event => {
+  const handleSubmit = (event: React.FormEvent | React.MouseEvent) => {
     event.preventDefault();
 
     if (radiusValue.length) {
@@ -12,10 +16,10 @@ function SettingsForm(props) {
         {
           pluginMessage: {
             type: "update-border-radius",
-            radiusValues: radiusValue
-          }
+            radiusValues: radiusValue,
+          },
         },
-        "*"
+        "*",
       );
     }
   };
@@ -24,10 +28,10 @@ function SettingsForm(props) {
     parent.postMessage(
       {
         pluginMessage: {
-          type: "reset-border-radius"
-        }
+          type: "reset-border-radius",
+        },
       },
-      "*"
+      "*",
     );
   }
 
@@ -48,7 +52,7 @@ function SettingsForm(props) {
             type="input"
             className="input-icon__input"
             value={radiusValue}
-            onChange={e => setRadiusValue(e.target.value)}
+            onChange={(e) => setRadiusValue(e.target.value)}
             placeholder={props.borderRadiusValues}
           />
         </div>

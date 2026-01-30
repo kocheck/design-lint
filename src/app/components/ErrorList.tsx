@@ -1,25 +1,34 @@
 import * as React from "react";
 import ErrorListItem from "./ErrorListItem";
+import { LintError, NodeWithErrors } from "../../types";
 
-function ErrorList(props) {
-  const handleIgnoreClick = error => {
+interface ErrorListProps {
+  errors: LintError[];
+  allErrors: NodeWithErrors[];
+  onIgnoredUpdate: (error: LintError) => void;
+  onIgnoreAll: (error: LintError) => void;
+  onSelectAll: (error: LintError) => void;
+}
+
+function ErrorList(props: ErrorListProps) {
+  const handleIgnoreClick = (error: LintError) => {
     props.onIgnoredUpdate(error);
   };
 
-  const handleIgnoreAll = error => {
+  const handleIgnoreAll = (error: LintError) => {
     props.onIgnoreAll(error);
   };
 
-  const handleSelectAll = error => {
+  const handleSelectAll = (error: LintError) => {
     props.onSelectAll(error);
   };
 
   // Finds how many other nodes have this exact error.
-  function countInstancesOfThisError(error) {
-    let nodesToBeSelected = [];
+  function countInstancesOfThisError(error: LintError): number {
+    const nodesToBeSelected: string[] = [];
 
-    props.allErrors.forEach(node => {
-      node.errors.forEach(item => {
+    props.allErrors.forEach((node: NodeWithErrors) => {
+      node.errors.forEach((item: LintError) => {
         if (item.value === error.value) {
           if (item.type === error.type) {
             nodesToBeSelected.push(item.node.id);
@@ -33,7 +42,7 @@ function ErrorList(props) {
 
   // ErrorListItem and BulkErrorListItem are nearly indentical bar a
   // few differences in what information and context menu items they have.
-  const errorListItems = props.errors.map((error, index) => (
+  const errorListItems = props.errors.map((error: LintError, index: number) => (
     <ErrorListItem
       error={error}
       errorCount={countInstancesOfThisError(error)}

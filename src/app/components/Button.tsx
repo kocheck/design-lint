@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion/dist/framer-motion";
+import { BulkError } from "../../types";
 
-function Button({ error, applyStyle }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerId, setTimerId] = useState(null);
+interface ButtonProps {
+  error: BulkError;
+  applyStyle: (error: BulkError) => void;
+}
+
+function Button({ error, applyStyle }: ButtonProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return () => {
@@ -14,7 +19,7 @@ function Button({ error, applyStyle }) {
     };
   }, [timerId]);
 
-  const handleClick = error => {
+  const handleClick = (error: BulkError) => {
     if (!isLoading) {
       setIsLoading(true);
 
@@ -28,14 +33,13 @@ function Button({ error, applyStyle }) {
   };
 
   return (
-    <motion.button
-      whileTap={{ scale: 0.98, opacity: 0.8 }}
+    <button
       onClick={() => handleClick(error)}
-      className={
+      className={`tap-effect ${
         isLoading
           ? "loading-button disabled match-button"
           : "loading-button match-button"
-      }
+      }`}
     >
       {isLoading ? (
         <div className="button-loading-dots match-button-loading">
@@ -46,7 +50,7 @@ function Button({ error, applyStyle }) {
       ) : (
         <>Fix All</>
       )}
-    </motion.button>
+    </button>
   );
 }
 
