@@ -382,6 +382,62 @@
   background: #06d6a01a;
 }
 
+.error-background-spacing {
+  background: #ff98001a;
+}
+
+.error-background-component {
+  background: #9747ff1a;
+}
+
+.error-background-naming {
+  background: #e91e631a;
+}
+
+.error-background-nesting {
+  background: #00bcd41a;
+}
+
+/* Severity Indicators */
+.severity-error {
+  /* Default error state - no additional styling needed */
+}
+
+.severity-warning .error-type {
+  border: 2px solid #f5a623;
+}
+
+.severity-warning .severity-icon {
+  color: #f5a623;
+}
+
+.severity-info .error-type {
+  border: 2px solid #18a0fb;
+}
+
+.severity-info .severity-icon {
+  color: #18a0fb;
+}
+
+.severity-icon {
+  font-size: 8px;
+  margin-right: 2px;
+  line-height: 1;
+}
+
+/* Severity-based list item border colors */
+.error-list-item.severity-warning {
+  border-left: 3px solid #f5a623;
+}
+
+.error-list-item.severity-info {
+  border-left: 3px solid #18a0fb;
+}
+
+.error-list-item.severity-error {
+  border-left: 3px solid #fe6262;
+}
+
 .context-icon {
   align-self: flex-end;
   margin-top: auto;
@@ -527,4 +583,63 @@
     transform: scale(0.85);
     opacity: 1;
   }
+}
+
+/* Rule Configuration Styles */
+.rule-config-list {
+  margin: 8px 0 16px;
+}
+
+.rule-config-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 100ms ease;
+}
+
+.rule-config-item:hover {
+  background-color: #f6f6f6;
+}
+
+.rule-config-checkbox {
+  margin-right: 8px;
+  padding-top: 2px;
+}
+
+.rule-config-checkbox input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.rule-config-content {
+  flex: 1;
+}
+
+.rule-config-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.rule-config-description {
+  font-size: 10px;
+  color: #666;
+  line-height: 1.3;
+}
+
+.rule-config-section {
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.rule-config-section .settings-title {
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.rule-config-section .settings-input {
+  margin-bottom: 0;
 }

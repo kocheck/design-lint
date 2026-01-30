@@ -105,6 +105,17 @@ body {
   align-content: center;
 }
 
+.ai-button {
+  font-size: 9px;
+  font-weight: 600;
+  color: #18a0fb;
+}
+
+.ai-icon {
+  font-size: 9px;
+  font-weight: 700;
+}
+
 /* Figma icon button override */
 .nav .icon--button {
   border: none;
@@ -530,6 +541,17 @@ body {
   width: 100%;
   position: absolute;
   background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.sticky-footer .export-button {
+  margin-right: 16px;
+  padding: 6px 10px;
+  font-size: 10px;
+  white-space: nowrap;
 }
 
 .actions-row {
@@ -605,6 +627,74 @@ body {
   height: auto;
   margin-top: 8px;
   margin-bottom: -4px;
+}
+
+/* Batch operations menu */
+.pill-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.pill-count {
+  margin-left: 2px;
+  opacity: 0.7;
+}
+
+.batch-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 140px;
+  overflow: hidden;
+}
+
+.batch-menu-header {
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 1px solid #e5e5e5;
+  background: #f9f9f9;
+  text-transform: capitalize;
+}
+
+.batch-menu-item {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: #fff;
+  text-align: left;
+  font-size: 11px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 100ms ease;
+}
+
+.batch-menu-item:hover {
+  background: #f0f0f0;
+}
+
+.batch-menu-item-primary {
+  color: #18a0fb;
+  font-weight: 500;
+}
+
+.batch-menu-item-primary:hover {
+  background: #e6f4ff;
+}
+
+.batch-menu-item-danger {
+  color: #fe6262;
+}
+
+.batch-menu-item-danger:hover {
+  background: #fff0f0;
 }
 
 /* ========================================

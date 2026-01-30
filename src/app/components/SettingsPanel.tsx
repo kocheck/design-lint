@@ -1,6 +1,8 @@
 import * as React from "react";
 import PanelHeader from "./PanelHeader";
 import SettingsForm from "./SettingsForm";
+import RuleConfigurationForm from "./RuleConfigurationForm";
+import type { LintRuleConfig } from "./RuleConfigurationForm";
 import "../styles/panel.css";
 import type { IgnoredError } from "../../types";
 
@@ -11,6 +13,8 @@ interface SettingsPanelProps {
   updateLintRules: (value: boolean) => void;
   ignoredErrorArray: IgnoredError[];
   borderRadiusValues: number[];
+  lintRuleConfig?: Partial<LintRuleConfig>;
+  onLintRuleConfigChange?: (config: LintRuleConfig) => void;
 }
 
 function SettingsPanel(props: SettingsPanelProps) {
@@ -100,6 +104,10 @@ function SettingsPanel(props: SettingsPanelProps) {
               </React.Fragment>
             )}
           </div>
+          <RuleConfigurationForm
+            initialConfig={props.lintRuleConfig}
+            onConfigChange={props.onLintRuleConfigChange}
+          />
         </div>
       </div>
 

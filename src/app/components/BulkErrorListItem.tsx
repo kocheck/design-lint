@@ -97,17 +97,36 @@ function BulkErrorListItem(props: BulkErrorListItemProps) {
 
   const hasNoMatches = !error.matches || error.matches.length === 0;
   const errorTypeIsNotRadius = error.type !== "radius";
+  const severity = error.severity || "error";
+
+  // Get severity indicator
+  const getSeverityIndicator = () => {
+    switch (severity) {
+      case "warning":
+        return { icon: "⚠", className: "severity-warning" };
+      case "info":
+        return { icon: "ℹ", className: "severity-info" };
+      default:
+        return { icon: "", className: "severity-error" };
+    }
+  };
+
+  const severityInfo = getSeverityIndicator();
 
   return (
     <li
-      className="error-list-item list-item-enter"
+      className={`error-list-item list-item-enter ${severityInfo.className}`}
       key={error.node.id + props.index}
       data-type={error.type.toLowerCase()}
+      data-severity={severity}
     >
       <div className="flex-row" ref={ref} onClick={showMenu}>
         <span
-          className={`error-type error-background-${error.type.toLowerCase()}`}
+          className={`error-type error-background-${error.type.toLowerCase()} ${severityInfo.className}`}
         >
+          {severityInfo.icon && (
+            <span className="severity-icon">{severityInfo.icon}</span>
+          )}
           <img
             src={require(
               "../assets/error-type/" + error.type.toLowerCase() + ".svg",

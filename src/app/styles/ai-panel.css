@@ -1,0 +1,405 @@
+/* AI Panel Styles */
+.ai-panel-content {
+  padding: 16px;
+  height: calc(100% - 60px);
+  overflow-y: auto;
+}
+
+/* Status Section */
+.ai-status-section {
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.ai-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ai-status-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+}
+
+.ai-status-indicator {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.ai-status-online {
+  background: #e6f9f0;
+  color: #0d7a3b;
+}
+
+.ai-status-offline {
+  background: #fff0f0;
+  color: #d32f2f;
+}
+
+.ai-status-message {
+  margin-top: 8px;
+}
+
+.ai-status-message p {
+  font-size: 11px;
+  color: #666;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.ai-status-info {
+  margin-top: 4px;
+}
+
+.ai-model-label {
+  font-size: 10px;
+  color: #666;
+}
+
+/* Stats Section */
+.ai-stats-section {
+  display: flex;
+  gap: 16px;
+  padding: 8px 12px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.ai-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ai-stats-label {
+  font-size: 10px;
+  color: #666;
+}
+
+.ai-stats-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Feature Section */
+.ai-feature-section {
+  padding: 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.ai-feature-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px;
+}
+
+.ai-feature-description {
+  font-size: 11px;
+  color: #666;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.ai-feature-button {
+  width: 100%;
+}
+
+.ai-feature-button.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Result Section */
+.ai-result-section {
+  margin-top: 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ai-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f9f9f9;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.ai-result-header h4 {
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.ai-result-content {
+  padding: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.ai-result-text {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  margin: 0;
+}
+
+/* Error Display */
+.ai-error {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  background: #fff0f0;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+.ai-error-icon {
+  margin-right: 8px;
+  color: #d32f2f;
+}
+
+.ai-error-message {
+  font-size: 11px;
+  color: #c62828;
+  line-height: 1.4;
+}
+
+/* Processing Indicator */
+.ai-processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  margin-top: 16px;
+}
+
+.ai-processing-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e5e5e5;
+  border-top-color: #18a0fb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ai-processing-text {
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+}
+
+/* Tabs for features (if needed) */
+.ai-tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 16px;
+}
+
+.ai-tab {
+  flex: 1;
+  padding: 8px;
+  background: none;
+  border: none;
+  font-size: 11px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 100ms ease;
+}
+
+.ai-tab:hover {
+  color: #333;
+}
+
+.ai-tab.active {
+  color: #18a0fb;
+  border-bottom-color: #18a0fb;
+}
+
+/* Rich Context Section */
+.ai-context-section {
+  padding: 12px;
+  background: linear-gradient(135deg, #f0f7ff 0%, #f5f0ff 100%);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #e0e7ff;
+}
+
+.ai-context-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.ai-context-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+}
+
+.ai-context-refresh {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #666;
+  transition: all 100ms ease;
+}
+
+.ai-context-refresh:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #18a0fb;
+}
+
+.ai-context-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-context-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ai-context-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 4px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+}
+
+.ai-context-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #18a0fb;
+}
+
+.ai-context-desc {
+  font-size: 9px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ai-context-patterns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.ai-context-pattern-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: #666;
+}
+
+.ai-context-pattern-values {
+  font-size: 10px;
+  color: #333;
+  font-family: monospace;
+}
+
+.ai-context-loading {
+  padding: 12px;
+  text-align: center;
+  font-size: 11px;
+  color: #666;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+/* Rename Suggestions */
+.ai-rename-list {
+  padding: 8px;
+}
+
+.ai-rename-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.ai-rename-item:last-child {
+  border-bottom: none;
+}
+
+.ai-rename-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-rename-original {
+  font-size: 11px;
+  color: #666;
+  text-decoration: line-through;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ai-rename-arrow {
+  color: #999;
+  font-size: 12px;
+}
+
+.ai-rename-suggested {
+  font-size: 11px;
+  font-weight: 500;
+  color: #18a0fb;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ai-rename-apply {
+  padding: 4px 8px;
+  font-size: 10px;
+  margin-left: 8px;
+}

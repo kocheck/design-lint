@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import BulkErrorListItem from "./BulkErrorListItem";
 import TotalErrorCount from "./TotalErrorCount";
 import PreloaderCSS from "./PreloaderCSS";
@@ -36,6 +42,28 @@ function BulkErrorList(props: BulkErrorListProps): JSX.Element {
   const [selectedFilters, setSelectedFilters] = useState<Set<string>>(
     new Set(["All"]),
   );
+  const [batchMenuOpen, setBatchMenuOpen] = useState<string | null>(null);
+  const batchMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close batch menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        batchMenuRef.current &&
+        !batchMenuRef.current.contains(event.target as Node)
+      ) {
+        setBatchMenuOpen(null);
+      }
+    };
+
+    if (batchMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [batchMenuOpen]);
 
   const availableFilters = [
     "All",
@@ -261,6 +289,157 @@ function BulkErrorList(props: BulkErrorListProps): JSX.Element {
     });
   }, []);
 
+  // Batch operations by error type
+  const handleBatchFixByType = useCallback(
+    (type: string) => {
+      const errorsOfType = bulkErrorList.filter(
+        (error) =>
+          error.type === type && error.matches && error.matches.length > 0,
+      );
+      errorsOfType.forEach((error) => {
+        handleFixAll(error);
+      });
+      setBatchMenuOpen(null);
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: "notify-user",
+            message: `Fixed all ${type} errors with matches`,
+          },
+        },
+        "*",
+      );
+    },
+    [bulkErrorList],
+  );
+
+  const handleBatchIgnoreByType = useCallback(
+    (type: string) => {
+      const errorsToIgnore: LintError[] = [];
+      filteredErrorArray.forEach((node) => {
+        node.errors.forEach((error) => {
+          if (error.type === type) {
+            errorsToIgnore.push(error);
+          }
+        });
+      });
+      if (errorsToIgnore.length > 0) {
+        props.onIgnoreAll(errorsToIgnore);
+      }
+      setBatchMenuOpen(null);
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: "notify-user",
+            message: `Ignored all ${type} errors`,
+          },
+        },
+        "*",
+      );
+    },
+    [filteredErrorArray, props.onIgnoreAll],
+  );
+
+  const handleBatchSelectByType = useCallback(
+    (type: string) => {
+      const nodeIds: string[] = [];
+      bulkErrorList
+        .filter((error) => error.type === type)
+        .forEach((error) => {
+          nodeIds.push(...error.nodes);
+        });
+      const uniqueIds = [...new Set(nodeIds)];
+      if (uniqueIds.length > 0) {
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: "select-multiple-layers",
+              nodeArray: uniqueIds,
+            },
+          },
+          "*",
+        );
+      }
+      setBatchMenuOpen(null);
+    },
+    [bulkErrorList],
+  );
+
+  // Get count of errors by type
+  const errorCountByType = useMemo(() => {
+    const counts: Record<string, { total: number; fixable: number }> = {};
+    bulkErrorList.forEach((error) => {
+      if (!counts[error.type]) {
+        counts[error.type] = { total: 0, fixable: 0 };
+      }
+      counts[error.type].total += error.count;
+      if (error.matches && error.matches.length > 0) {
+        counts[error.type].fixable += error.count;
+      }
+    });
+    return counts;
+  }, [bulkErrorList]);
+
+  const handleExportReport = useCallback(() => {
+    const report = {
+      timestamp: new Date().toISOString(),
+      summary: {
+        totalErrors: bulkErrorList.reduce((sum, e) => sum + e.count, 0),
+        totalUniqueErrors: bulkErrorList.length,
+        byType: bulkErrorList.reduce(
+          (acc, error) => {
+            acc[error.type] = (acc[error.type] || 0) + error.count;
+            return acc;
+          },
+          {} as Record<string, number>,
+        ),
+        bySeverity: bulkErrorList.reduce(
+          (acc, error) => {
+            const severity = error.severity || "error";
+            acc[severity] = (acc[severity] || 0) + error.count;
+            return acc;
+          },
+          {} as Record<string, number>,
+        ),
+      },
+      errors: bulkErrorList.map((error) => ({
+        type: error.type,
+        severity: error.severity || "error",
+        message: error.message,
+        value: error.value,
+        count: error.count,
+        nodeIds: error.nodes,
+        hasMatch: !!(error.matches && error.matches.length > 0),
+        hasSuggestion: !!(error.suggestions && error.suggestions.length > 0),
+        suggestedFix:
+          error.matches?.[0]?.name || error.suggestions?.[0]?.name || null,
+      })),
+    };
+
+    // Create and download JSON file
+    const blob = new Blob([JSON.stringify(report, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `design-lint-report-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "notify-user",
+          message: "Lint report exported",
+        },
+      },
+      "*",
+    );
+  }, [bulkErrorList]);
+
   // Memoize error list items
   const errorListItems = useMemo(() => {
     return filteredErrorList.map((error, index) => (
@@ -301,15 +480,57 @@ function BulkErrorList(props: BulkErrorListProps): JSX.Element {
       <div className="filter-pills">
         {availableFilters.map((filter, index) => (
           <React.Fragment key={filter}>
-            <button
-              key={filter}
-              className={`pill tap-effect ${
-                selectedFilters.has(filter) ? "selected" : ""
-              }`}
-              onClick={() => handleFilterClick(filter)}
+            <div
+              className="pill-wrapper"
+              ref={batchMenuOpen === filter ? batchMenuRef : null}
             >
-              {filter}
-            </button>
+              <button
+                className={`pill tap-effect ${
+                  selectedFilters.has(filter) ? "selected" : ""
+                }`}
+                onClick={() => handleFilterClick(filter)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  if (filter !== "All") {
+                    setBatchMenuOpen(batchMenuOpen === filter ? null : filter);
+                  }
+                }}
+              >
+                {filter}
+                {filter !== "All" && errorCountByType[filter] && (
+                  <span className="pill-count">
+                    ({errorCountByType[filter].total})
+                  </span>
+                )}
+              </button>
+              {batchMenuOpen === filter && filter !== "All" && (
+                <div className="batch-menu">
+                  <div className="batch-menu-header">
+                    Batch Actions: {filter}
+                  </div>
+                  <button
+                    className="batch-menu-item"
+                    onClick={() => handleBatchSelectByType(filter)}
+                  >
+                    Select All ({errorCountByType[filter]?.total || 0})
+                  </button>
+                  {errorCountByType[filter]?.fixable > 0 && (
+                    <button
+                      className="batch-menu-item batch-menu-item-primary"
+                      onClick={() => handleBatchFixByType(filter)}
+                    >
+                      Fix All ({errorCountByType[filter].fixable})
+                    </button>
+                  )}
+                  <button
+                    className="batch-menu-item batch-menu-item-danger"
+                    onClick={() => handleBatchIgnoreByType(filter)}
+                  >
+                    Ignore All
+                  </button>
+                </div>
+              )}
+            </div>
             {index === 0 && <span className="pill-divider">|</span>}
           </React.Fragment>
         ))}
@@ -343,6 +564,15 @@ function BulkErrorList(props: BulkErrorListProps): JSX.Element {
       </div>
       <div className="footer sticky-footer">
         <TotalErrorCount errorArray={filteredErrorArray} />
+        {bulkErrorList.length > 0 && (
+          <button
+            className="button button--secondary export-button"
+            onClick={handleExportReport}
+            title="Export lint report as JSON"
+          >
+            Export Report
+          </button>
+        )}
       </div>
       <Modal
         isOpen={isModalOpen}

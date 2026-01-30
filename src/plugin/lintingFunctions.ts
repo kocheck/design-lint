@@ -10,6 +10,7 @@ import type {
   Library,
   RemoteStyles,
   ColorObject,
+  ErrorSeverity,
 } from "../types/index";
 
 // Generic function for creating an error object to pass to the app.
@@ -33,12 +34,14 @@ export function createErrorObject(
   textProperties?: TextProperties,
   variableMatches?: VariableMatch[],
   variableSuggestions?: VariableSuggestion[],
+  severity?: ErrorSeverity,
 ): LintError {
   const error: LintError = {
     message: message,
     type: type,
     node: node,
     value: value || "",
+    severity: severity || "error", // Default to "error" for backward compatibility
     ...(matches && { matches: matches }),
     ...(suggestions && { suggestions: suggestions }),
     ...(fillColor !== undefined && { fillColor: fillColor }),
@@ -1622,6 +1625,89 @@ export const CUSTOM_LINT_CONFIG = {
   enableIconSizeCheck: true,
 };
 
+/**
+ * Updates the CUSTOM_LINT_CONFIG with new values from the UI.
+ * Only updates boolean flags and numeric values, not complex patterns.
+ */
+export function updateLintConfig(
+  newConfig: Partial<{
+    enableColorCheck: boolean;
+    enableTypographyCheck: boolean;
+    enableSpacingCheck: boolean;
+    enableComponentCheck: boolean;
+    enableNamingCheck: boolean;
+    enableNestingCheck: boolean;
+    enableFixedDimensionsCheck: boolean;
+    enableTouchTargetCheck: boolean;
+    enableEmptyFrameCheck: boolean;
+    enableDetachedInstanceCheck: boolean;
+    enableIconSizeCheck: boolean;
+    allowedSpacingValues: number[];
+    allowedIconSizes: number[];
+    minTouchTargetSize: number;
+    maxAutoLayoutNestingDepth: number;
+  }>,
+): void {
+  // Update boolean flags
+  if (typeof newConfig.enableColorCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableColorCheck = newConfig.enableColorCheck;
+  }
+  if (typeof newConfig.enableTypographyCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableTypographyCheck = newConfig.enableTypographyCheck;
+  }
+  if (typeof newConfig.enableSpacingCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableSpacingCheck = newConfig.enableSpacingCheck;
+  }
+  if (typeof newConfig.enableComponentCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableComponentCheck = newConfig.enableComponentCheck;
+  }
+  if (typeof newConfig.enableNamingCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableNamingCheck = newConfig.enableNamingCheck;
+  }
+  if (typeof newConfig.enableNestingCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableNestingCheck = newConfig.enableNestingCheck;
+  }
+  if (typeof newConfig.enableFixedDimensionsCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableFixedDimensionsCheck =
+      newConfig.enableFixedDimensionsCheck;
+  }
+  if (typeof newConfig.enableTouchTargetCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableTouchTargetCheck =
+      newConfig.enableTouchTargetCheck;
+  }
+  if (typeof newConfig.enableEmptyFrameCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableEmptyFrameCheck = newConfig.enableEmptyFrameCheck;
+  }
+  if (typeof newConfig.enableDetachedInstanceCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableDetachedInstanceCheck =
+      newConfig.enableDetachedInstanceCheck;
+  }
+  if (typeof newConfig.enableIconSizeCheck === "boolean") {
+    CUSTOM_LINT_CONFIG.enableIconSizeCheck = newConfig.enableIconSizeCheck;
+  }
+
+  // Update numeric values
+  if (Array.isArray(newConfig.allowedSpacingValues)) {
+    CUSTOM_LINT_CONFIG.allowedSpacingValues = newConfig.allowedSpacingValues;
+  }
+  if (Array.isArray(newConfig.allowedIconSizes)) {
+    CUSTOM_LINT_CONFIG.allowedIconSizes = newConfig.allowedIconSizes;
+  }
+  if (
+    typeof newConfig.minTouchTargetSize === "number" &&
+    newConfig.minTouchTargetSize > 0
+  ) {
+    CUSTOM_LINT_CONFIG.minTouchTargetSize = newConfig.minTouchTargetSize;
+  }
+  if (
+    typeof newConfig.maxAutoLayoutNestingDepth === "number" &&
+    newConfig.maxAutoLayoutNestingDepth > 0
+  ) {
+    CUSTOM_LINT_CONFIG.maxAutoLayoutNestingDepth =
+      newConfig.maxAutoLayoutNestingDepth;
+  }
+}
+
 // --------------------------------------------
 // HELPER FUNCTIONS
 // --------------------------------------------
@@ -2019,6 +2105,13 @@ export function checkComponentUsage(
               "component",
               "Use Button component",
               `This ${node.width}x${node.height}px frame with text looks like a button. Consider using a Button component from the library.`,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              "info",
             ),
           );
           return;
@@ -2045,6 +2138,13 @@ export function checkComponentUsage(
           "component",
           "Use Input component",
           `This ${node.width}x${node.height}px frame with border looks like an input field. Consider using an Input component.`,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          "info",
         ),
       );
       return;
@@ -2074,6 +2174,13 @@ export function checkComponentUsage(
               "component",
               "Consider Card component",
               `This ${node.width}x${node.height}px frame with ${childCount} children looks like a card. Consider using a Card component.`,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              "info",
             ),
           );
           return;
@@ -2112,6 +2219,13 @@ export function checkComponentUsage(
               "component",
               "Use Avatar component",
               `This ${nodeSize}px circular image looks like an avatar. Consider using an Avatar component.`,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              "info",
             ),
           );
         }
@@ -2159,6 +2273,13 @@ export function checkNamingConventions(
         "naming",
         "Rename layer",
         `"${name}" is a default Figma name. Give this layer a descriptive name that reflects its purpose.`,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "warning",
       ),
     );
     return;
@@ -2209,6 +2330,13 @@ export function checkNamingConventions(
         "naming",
         "Naming convention",
         `"${name}" doesn't follow naming conventions. Expected: ${patternDescription}`,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "warning",
       ),
     );
   }
@@ -2255,6 +2383,13 @@ export function checkAutoLayoutNesting(
         "nesting",
         "Deep auto-layout nesting",
         `This frame is nested ${depth} levels deep in auto-layout (max recommended: ${maxDepth}). Consider simplifying the structure or extracting into a component.`,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "warning", // Lenient - advisory only
       ),
     );
   }
@@ -2352,6 +2487,13 @@ export function checkFixedDimensions(
         "fill", // Using 'fill' type as it relates to layout
         "Fixed dimensions",
         `${issues.join(", ")}. Consider using "Hug" or "Fill" for responsive layouts.`,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "info",
       ),
     );
   }
@@ -2415,6 +2557,13 @@ export function checkTouchTargetSize(
         "radius", // Using 'radius' type as it relates to sizing
         "Touch target too small",
         `${issues.join(", ")} is below ${minSize}px minimum. Small touch targets are hard to tap on mobile.`,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "warning",
       ),
     );
   }
@@ -2467,6 +2616,13 @@ export function checkEmptyFrames(node: SceneNode, errors: LintError[]): void {
           "fill", // Using 'fill' type
           "Empty frame",
           `"${node.name}" has no children. Remove if unused or add content.`,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          "warning",
         ),
       );
     }
@@ -2529,6 +2685,13 @@ export function checkDetachedInstances(
           "component",
           "Possibly detached instance",
           `"${name}" looks like a detached component. Re-link to the library component for consistency.`,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          "warning",
         ),
       );
     }
@@ -2603,6 +2766,13 @@ export function checkIconSize(node: SceneNode, errors: LintError[]): void {
         "radius", // Using 'radius' type for sizing issues
         "Non-standard icon size",
         `${width}×${height}px is not a standard icon size. Use: ${allowedStr}px`,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        "warning",
       ),
     );
   }

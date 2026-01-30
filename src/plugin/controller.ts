@@ -6,6 +6,7 @@ import {
   newCheckEffects,
   determineFill,
   gradientToCSS,
+  updateLintConfig,
   // customCheckTextFills,
   // uncomment this as an example of a custom lint function ^
   // ========== CUSTOM LINT RULES - BreakLine Design System ==========
@@ -42,6 +43,8 @@ import type {
   NodeWithErrors,
   LintError,
   BulkError,
+  RichLayerContext,
+  RichDesignContext,
 } from "../types";
 
 figma.showUI(__html__, { width: 360, height: 580 });
@@ -116,6 +119,420 @@ function getDocumentUUID(): string {
 
 // Set the unique ID we use for client storage.
 const documentUUID = getDocumentUUID();
+
+// ============================================
+// Rich Design Context Gathering for AI
+// ============================================
+
+async function gatherRichDesignContext(
+  nodeIds: string[],
+): Promise<RichDesignContext> {
+  const layers: RichLayerContext[] = [];
+  const componentUsageMap = new Map<
+    string,
+    { name: string; instanceCount: number; isLocal: boolean }
+  >();
+  const styleUsageMap = {
+    fills: new Map<string, number>(),
+    text: new Map<string, number>(),
+    effects: new Map<string, number>(),
+  };
+  const variableUsageMap = new Map<
+    string,
+    { name: string; collection: string; count: number; type: string }
+  >();
+  const spacingValues = new Set<number>();
+  const cornerRadii = new Set<number>();
+  const fontSizes = new Set<number>();
+  let autoLayoutCount = 0;
+  let componentCount = 0;
+  let styledCount = 0;
+  let totalNodes = 0;
+
+  // Get nodes to analyze - either specified nodes or current selection
+  let nodesToAnalyze: SceneNode[] = [];
+  if (nodeIds && nodeIds.length > 0) {
+    for (const id of nodeIds) {
+      const node = await figma.getNodeByIdAsync(id);
+      if (node && "id" in node) {
+        nodesToAnalyze.push(node as SceneNode);
+      }
+    }
+  } else {
+    nodesToAnalyze = [...figma.currentPage.selection];
+  }
+
+  // Helper to get node depth
+  function getNodeDepth(node: SceneNode): number {
+    let depth = 0;
+    let current: BaseNode | null = node.parent;
+    while (current && current.type !== "PAGE") {
+      depth++;
+      current = current.parent;
+    }
+    return depth;
+  }
+
+  // Helper to get sibling info
+  function getSiblingInfo(node: SceneNode): { index: number; count: number } {
+    const parent = node.parent;
+    if (parent && "children" in parent) {
+      const children = parent.children;
+      const index = children.indexOf(node);
+      return { index, count: children.length };
+    }
+    return { index: 0, count: 1 };
+  }
+
+  // Helper to extract color from fill
+  function getFillColor(fills: readonly Paint[] | symbol): string | undefined {
+    if (typeof fills === "symbol" || !fills.length) return undefined;
+    const fill = fills[0];
+    if (fill.type === "SOLID") {
+      const r = Math.round(fill.color.r * 255);
+      const g = Math.round(fill.color.g * 255);
+      const b = Math.round(fill.color.b * 255);
+      return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+    }
+    return fill.type;
+  }
+
+  // Process each node recursively
+  async function processNode(
+    node: SceneNode,
+    depth: number = 0,
+  ): Promise<void> {
+    totalNodes++;
+    const siblingInfo = getSiblingInfo(node);
+
+    // Build rich layer context
+    const layerContext: RichLayerContext = {
+      id: node.id,
+      name: node.name,
+      type: node.type,
+      width: "width" in node ? node.width : 0,
+      height: "height" in node ? node.height : 0,
+      x: "x" in node ? node.x : 0,
+      y: "y" in node ? node.y : 0,
+      parentName:
+        node.parent && "name" in node.parent ? node.parent.name : null,
+      parentType: node.parent ? node.parent.type : null,
+      depth: depth,
+      childCount:
+        "children" in node ? (node as ChildrenMixin).children.length : 0,
+      siblingIndex: siblingInfo.index,
+      siblingCount: siblingInfo.count,
+      isAutoLayout: false,
+      isComponent: node.type === "COMPONENT" || node.type === "COMPONENT_SET",
+      isInstance: node.type === "INSTANCE",
+      hasFillStyle: false,
+      hasTextStyle: false,
+      hasEffectStyle: false,
+      hasStrokeStyle: false,
+      opacity: "opacity" in node ? node.opacity : 1,
+      visible: node.visible,
+      locked: node.locked,
+      boundVariables: [],
+      fillCount: 0,
+      strokeCount: 0,
+      effectCount: 0,
+    };
+
+    // Auto-layout info
+    if ("layoutMode" in node && node.layoutMode !== "NONE") {
+      layerContext.isAutoLayout = true;
+      layerContext.autoLayoutDirection = node.layoutMode as
+        | "HORIZONTAL"
+        | "VERTICAL";
+      layerContext.autoLayoutGap = node.itemSpacing;
+      layerContext.autoLayoutPadding = {
+        top: node.paddingTop,
+        right: node.paddingRight,
+        bottom: node.paddingBottom,
+        left: node.paddingLeft,
+      };
+      layerContext.autoLayoutAlign = node.primaryAxisAlignItems;
+      autoLayoutCount++;
+
+      // Track spacing values
+      if (node.itemSpacing > 0) spacingValues.add(node.itemSpacing);
+      if (node.paddingTop > 0) spacingValues.add(node.paddingTop);
+      if (node.paddingRight > 0) spacingValues.add(node.paddingRight);
+      if (node.paddingBottom > 0) spacingValues.add(node.paddingBottom);
+      if (node.paddingLeft > 0) spacingValues.add(node.paddingLeft);
+    }
+
+    // Constraints
+    if ("constraints" in node) {
+      layerContext.constraintsHorizontal = node.constraints.horizontal;
+      layerContext.constraintsVertical = node.constraints.vertical;
+    }
+
+    // Component/Instance info
+    if (node.type === "INSTANCE") {
+      const mainComponent = node.mainComponent;
+      if (mainComponent) {
+        layerContext.mainComponentName = mainComponent.name;
+        componentCount++;
+
+        // Track component usage
+        const existing = componentUsageMap.get(mainComponent.id);
+        if (existing) {
+          existing.instanceCount++;
+        } else {
+          componentUsageMap.set(mainComponent.id, {
+            name: mainComponent.name,
+            instanceCount: 1,
+            isLocal: mainComponent.parent?.type !== "DOCUMENT",
+          });
+        }
+      }
+    }
+
+    // Variant properties
+    if (
+      node.type === "INSTANCE" &&
+      "variantProperties" in node &&
+      node.variantProperties
+    ) {
+      layerContext.variantProperties = node.variantProperties as Record<
+        string,
+        string
+      >;
+    }
+
+    // Fill styles
+    if ("fillStyleId" in node && node.fillStyleId) {
+      const styleId = node.fillStyleId;
+      if (typeof styleId === "string") {
+        layerContext.hasFillStyle = true;
+        styledCount++;
+        const style = await figma.getStyleByIdAsync(styleId);
+        if (style) {
+          layerContext.fillStyleName = style.name;
+          styleUsageMap.fills.set(
+            style.name,
+            (styleUsageMap.fills.get(style.name) || 0) + 1,
+          );
+        }
+      }
+    }
+
+    // Text styles
+    if (node.type === "TEXT" && "textStyleId" in node && node.textStyleId) {
+      const styleId = node.textStyleId;
+      if (typeof styleId === "string") {
+        layerContext.hasTextStyle = true;
+        styledCount++;
+        const style = await figma.getStyleByIdAsync(styleId);
+        if (style) {
+          layerContext.textStyleName = style.name;
+          styleUsageMap.text.set(
+            style.name,
+            (styleUsageMap.text.get(style.name) || 0) + 1,
+          );
+        }
+      }
+    }
+
+    // Effect styles
+    if ("effectStyleId" in node && node.effectStyleId) {
+      const styleId = node.effectStyleId;
+      if (typeof styleId === "string") {
+        layerContext.hasEffectStyle = true;
+        const style = await figma.getStyleByIdAsync(styleId);
+        if (style) {
+          layerContext.effectStyleName = style.name;
+          styleUsageMap.effects.set(
+            style.name,
+            (styleUsageMap.effects.get(style.name) || 0) + 1,
+          );
+        }
+      }
+    }
+
+    // Stroke styles
+    if ("strokeStyleId" in node && node.strokeStyleId) {
+      const styleId = node.strokeStyleId;
+      if (typeof styleId === "string") {
+        layerContext.hasStrokeStyle = true;
+      }
+    }
+
+    // Blend mode
+    if ("blendMode" in node) {
+      layerContext.blendMode = node.blendMode;
+    }
+
+    // Text-specific properties
+    if (node.type === "TEXT") {
+      layerContext.textContent = node.characters.substring(0, 100); // Truncate for size
+      if (typeof node.fontSize === "number") {
+        layerContext.fontSize = node.fontSize;
+        fontSizes.add(node.fontSize);
+      }
+      if (node.fontName && typeof node.fontName !== "symbol") {
+        layerContext.fontFamily = node.fontName.family;
+      }
+    }
+
+    // Fill info
+    if ("fills" in node) {
+      const fills = node.fills;
+      if (typeof fills !== "symbol") {
+        layerContext.fillCount = fills.length;
+        if (fills.length > 0) {
+          layerContext.primaryFillType = fills[0].type;
+          layerContext.primaryFillColor = getFillColor(fills);
+        }
+      }
+    }
+
+    // Stroke info
+    if ("strokes" in node) {
+      const strokes = node.strokes;
+      layerContext.strokeCount = strokes.length;
+      if ("strokeWeight" in node && typeof node.strokeWeight === "number") {
+        layerContext.strokeWeight = node.strokeWeight;
+      }
+    }
+
+    // Effects
+    if ("effects" in node) {
+      layerContext.effectCount = node.effects.length;
+      if (node.effects.length > 0) {
+        layerContext.effectTypes = node.effects.map((e) => e.type);
+      }
+    }
+
+    // Corner radius
+    if ("cornerRadius" in node) {
+      if (typeof node.cornerRadius === "number") {
+        layerContext.cornerRadius = node.cornerRadius;
+        if (node.cornerRadius > 0) cornerRadii.add(node.cornerRadius);
+      } else {
+        layerContext.cornerRadius = "mixed";
+      }
+    }
+
+    // Bound variables
+    if ("boundVariables" in node && node.boundVariables) {
+      const boundVars = node.boundVariables as Record<string, any>;
+      for (const [property, binding] of Object.entries(boundVars)) {
+        if (binding) {
+          const varId = Array.isArray(binding) ? binding[0]?.id : binding.id;
+          if (varId) {
+            try {
+              const variable =
+                await figma.variables.getVariableByIdAsync(varId);
+              if (variable) {
+                const collection =
+                  await figma.variables.getVariableCollectionByIdAsync(
+                    variable.variableCollectionId,
+                  );
+                layerContext.boundVariables.push({
+                  property,
+                  variableName: variable.name,
+                  variableCollection: collection?.name || "Unknown",
+                });
+
+                // Track variable usage
+                const existing = variableUsageMap.get(varId);
+                if (existing) {
+                  existing.count++;
+                } else {
+                  variableUsageMap.set(varId, {
+                    name: variable.name,
+                    collection: collection?.name || "Unknown",
+                    count: 1,
+                    type: variable.resolvedType,
+                  });
+                }
+              }
+            } catch {
+              // Variable might not be accessible
+            }
+          }
+        }
+      }
+    }
+
+    layers.push(layerContext);
+
+    // Process children (limit depth to prevent too much data)
+    if ("children" in node && depth < 5) {
+      for (const child of (node as ChildrenMixin).children) {
+        await processNode(child, depth + 1);
+      }
+    }
+  }
+
+  // Process all nodes
+  for (const node of nodesToAnalyze) {
+    await processNode(node, 0);
+  }
+
+  // Get document-level stats
+  const localPaintStyles = await figma.getLocalPaintStylesAsync();
+  const localTextStyles = await figma.getLocalTextStylesAsync();
+  const localEffectStyles = await figma.getLocalEffectStylesAsync();
+  const localComponents = await figma.currentPage.findAllWithCriteria({
+    types: ["COMPONENT"],
+  });
+
+  // Build selection type counts
+  const selectionTypes: Record<string, number> = {};
+  for (const layer of layers) {
+    selectionTypes[layer.type] = (selectionTypes[layer.type] || 0) + 1;
+  }
+
+  // Build the rich context object
+  const richContext: RichDesignContext = {
+    selectionCount: nodesToAnalyze.length,
+    selectionTypes,
+    pageName: figma.currentPage.name,
+    pageChildCount: figma.currentPage.children.length,
+    documentColorStyles: localPaintStyles.length,
+    documentTextStyles: localTextStyles.length,
+    documentEffectStyles: localEffectStyles.length,
+    documentComponents: localComponents.length,
+    layers: layers.slice(0, 50), // Limit to 50 layers for token efficiency
+    componentUsage: Array.from(componentUsageMap.values()),
+    styleUsage: {
+      fills: Array.from(styleUsageMap.fills.entries()).map(([name, count]) => ({
+        name,
+        count,
+      })),
+      text: Array.from(styleUsageMap.text.entries()).map(([name, count]) => ({
+        name,
+        count,
+      })),
+      effects: Array.from(styleUsageMap.effects.entries()).map(
+        ([name, count]) => ({ name, count }),
+      ),
+    },
+    variableUsage: Array.from(variableUsageMap.values()),
+    patterns: {
+      commonSpacingValues: Array.from(spacingValues)
+        .sort((a, b) => a - b)
+        .slice(0, 10),
+      commonCornerRadii: Array.from(cornerRadii)
+        .sort((a, b) => a - b)
+        .slice(0, 10),
+      commonFontSizes: Array.from(fontSizes)
+        .sort((a, b) => a - b)
+        .slice(0, 10),
+      autoLayoutUsagePercent:
+        totalNodes > 0 ? Math.round((autoLayoutCount / totalNodes) * 100) : 0,
+      componentUsagePercent:
+        totalNodes > 0 ? Math.round((componentCount / totalNodes) * 100) : 0,
+      styleAdherencePercent:
+        totalNodes > 0 ? Math.round((styledCount / totalNodes) * 100) : 0,
+    },
+  };
+
+  return richContext;
+}
 
 figma.on("documentchange", (_event: DocumentChangeEvent) => {
   // When a change happens in the document
@@ -295,6 +712,46 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
   // Changes the linting rules, invoked from the settings menu
   if (msg.type === "update-lint-rules-from-settings") {
     lintVectors = msg.boolean;
+  }
+
+  // Updates the custom lint rules configuration
+  if (msg.type === "update-lint-config") {
+    if (msg.config) {
+      updateLintConfig(msg.config);
+
+      // Save to client storage for persistence
+      const configToStore = JSON.stringify(msg.config);
+      figma.clientStorage.setAsync("lintRuleConfig", configToStore);
+
+      figma.notify("Lint rules configuration saved", { timeout: 1000 });
+
+      // Let the UI know the config was updated
+      figma.ui.postMessage({
+        type: "lint-config-updated",
+        config: msg.config,
+      });
+    }
+  }
+
+  // Rename a layer (AI-assisted)
+  if (msg.type === "rename-layer") {
+    (async function () {
+      const node = await figma.getNodeByIdAsync(msg.id);
+      if (node && "name" in node) {
+        node.name = msg.name;
+      }
+    })();
+  }
+
+  // Request rich design context for AI analysis
+  if (msg.type === "request-rich-context") {
+    (async function () {
+      const richContext = await gatherRichDesignContext(msg.nodeIds || []);
+      figma.ui.postMessage({
+        type: "rich-context-response",
+        context: richContext,
+      });
+    })();
   }
 
   // For when the user updates the border radius values to lint from the settings menu.
@@ -1590,11 +2047,10 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
 
             // Let the UI know we're done and send the
             // variables back to be displayed.
-            // figma.ui.postMessage({
-            //   type: "variables-imported",
-            //   message: variablesWithGroupedConsumers
-            // });
-            // console.log(variablesWithGroupedConsumers);
+            figma.ui.postMessage({
+              type: "variables-imported",
+              message: variablesWithGroupedConsumers,
+            });
           });
 
           // Now that libraries are available, call lint with libraries and localStylesLibrary, then send the message
@@ -1624,6 +2080,23 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
             type: "fetched border radius",
             storage: result,
           });
+        }
+      });
+
+      // Load saved lint rule configuration
+      figma.clientStorage.getAsync("lintRuleConfig").then((result) => {
+        if (result && result.length) {
+          try {
+            const savedConfig = JSON.parse(result);
+            updateLintConfig(savedConfig);
+
+            figma.ui.postMessage({
+              type: "lint-config-loaded",
+              config: savedConfig,
+            });
+          } catch (e) {
+            console.error("Error loading lint config:", e);
+          }
         }
       });
     }

@@ -5,6 +5,7 @@ import Navigation from "./Navigation";
 import NodeList from "./NodeList";
 import LibraryPage from "./LibraryPage";
 import StylesPage from "./StylesPage";
+import VariablesPage from "./VariablesPage";
 import PreloaderCSS from "./PreloaderCSS";
 import EmptyState from "./EmptyState";
 import Panel from "./Panel";
@@ -21,7 +22,9 @@ import type {
   IgnoredError,
   Library,
   RemoteStyles,
+  VariablesInUse,
   ActivePage,
+  LintRuleConfig,
 } from "../../types";
 
 interface SelectedNode {
@@ -81,6 +84,12 @@ const App: React.FC = () => {
     Library | Record<string, never>
   >({});
   const [stylesInUse, setStylesInUse] = useState<RemoteStyles | null>(null);
+  const [variablesInUse, setVariablesInUse] = useState<VariablesInUse | null>(
+    null,
+  );
+  const [lintRuleConfig, setLintRuleConfig] = useState<Partial<LintRuleConfig>>(
+    {},
+  );
 
   const librariesRef = useRef<Library[]>([]);
   const activePageRef = useRef<ActivePage | "bulk">(activePage);
@@ -209,6 +218,10 @@ const App: React.FC = () => {
       },
       "*",
     );
+  }, []);
+
+  const handleLintRuleConfigChange = useCallback((config: LintRuleConfig) => {
+    setLintRuleConfig(config);
   }, []);
 
   const updateVisibility = useCallback(() => {
@@ -411,6 +424,18 @@ const App: React.FC = () => {
         case "remote-styles-imported":
           setStylesInUse(message as unknown as RemoteStyles);
           break;
+
+        case "variables-imported":
+          setVariablesInUse(message as unknown as VariablesInUse);
+          break;
+
+        case "lint-config-loaded":
+        case "lint-config-updated":
+          setLintRuleConfig(
+            (event.data.pluginMessage as { config?: Partial<LintRuleConfig> })
+              .config || {},
+          );
+          break;
       }
     };
 
@@ -430,6 +455,10 @@ const App: React.FC = () => {
         borderRadiusValues={borderRadiusValues}
         lintVectors={lintVectors}
         onRefreshSelection={onRunApp}
+        lintRuleConfig={lintRuleConfig}
+        onLintRuleConfigChange={handleLintRuleConfigChange}
+        errorArray={errorArray}
+        stylesInUse={stylesInUse}
       />
       {activeNodeIds.length !== 0 ? (
         <div>
@@ -453,6 +482,8 @@ const App: React.FC = () => {
             />
           ) : activePage === "styles" ? (
             <StylesPage stylesInUse={stylesInUse} />
+          ) : activePage === "variables" ? (
+            <VariablesPage variablesInUse={variablesInUse} />
           ) : (
             <BulkErrorList
               libraries={libraries}

@@ -1,6 +1,13 @@
 import * as React from "react";
 import SettingsPanel from "./SettingsPanel";
-import { ActivePage, IgnoredError } from "../../types";
+import AIPanel from "./AIPanel";
+import {
+  ActivePage,
+  IgnoredError,
+  LintRuleConfig,
+  NodeWithErrors,
+  RemoteStyles,
+} from "../../types";
 
 interface NavigationProps {
   activePage: ActivePage | "bulk";
@@ -10,10 +17,15 @@ interface NavigationProps {
   onPageSelection: (page: ActivePage | "bulk") => void;
   updateLintRules: (boolean: boolean) => void;
   onRefreshSelection: () => void;
+  lintRuleConfig?: Partial<LintRuleConfig>;
+  onLintRuleConfigChange?: (config: LintRuleConfig) => void;
+  errorArray?: NodeWithErrors[];
+  stylesInUse?: RemoteStyles | null;
 }
 
 function Navigation(props: NavigationProps) {
   const [panelVisible, setPanelVisible] = React.useState<boolean>(false);
+  const [aiPanelVisible, setAiPanelVisible] = React.useState<boolean>(false);
   const activePage = props.activePage;
 
   const layersClick = () => {
@@ -43,12 +55,20 @@ function Navigation(props: NavigationProps) {
     props.onPageSelection("styles");
   };
 
+  const variablesClick = () => {
+    props.onPageSelection("variables");
+  };
+
   const handleLintRulesChange = (boolean: boolean) => {
     props.updateLintRules(boolean);
   };
 
   const handlePanelVisible = (boolean: boolean) => {
     setPanelVisible(boolean);
+  };
+
+  const handleAiPanelVisible = (boolean: boolean) => {
+    setAiPanelVisible(boolean);
   };
 
   const handleRefreshSelection = () => {
@@ -83,6 +103,12 @@ function Navigation(props: NavigationProps) {
           >
             Styles
           </div>
+          <div
+            className={`nav-item tap-effect ${activePage === "variables" ? "active" : ""}`}
+            onClick={variablesClick}
+          >
+            Variables
+          </div>
 
           <div className="nav-icon-wrapper">
             <button
@@ -93,6 +119,16 @@ function Navigation(props: NavigationProps) {
               }}
             >
               <img src={require("../assets/refresh.svg")} />
+            </button>
+            <button
+              className="icon icon--button settings-button tap-effect-small ai-button"
+              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                event.stopPropagation();
+                handleAiPanelVisible(true);
+              }}
+              title="AI Assistant"
+            >
+              <span className="ai-icon">AI</span>
             </button>
             <button
               className="icon icon--adjust icon--button settings-button tap-effect-small"
@@ -111,6 +147,14 @@ function Navigation(props: NavigationProps) {
         borderRadiusValues={props.borderRadiusValues}
         updateLintRules={handleLintRulesChange}
         lintVectors={props.lintVectors}
+        lintRuleConfig={props.lintRuleConfig}
+        onLintRuleConfigChange={props.onLintRuleConfigChange}
+      />
+      <AIPanel
+        panelVisible={aiPanelVisible}
+        onHandlePanelVisible={handleAiPanelVisible}
+        errorArray={props.errorArray || []}
+        stylesInUse={props.stylesInUse}
       />
     </div>
   );

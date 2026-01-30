@@ -5,6 +5,8 @@
 // Error Types
 // ============================================
 
+export type ErrorSeverity = "error" | "warning" | "info";
+
 export interface LintError {
   message: string;
   type:
@@ -17,6 +19,7 @@ export interface LintError {
     | "component"
     | "naming"
     | "nesting";
+  severity?: ErrorSeverity;
   node: SceneNode;
   value: string;
   matches?: StyleMatch[];
@@ -240,7 +243,14 @@ export type PluginMessageType =
   | "find-local-styles"
   | "save-library"
   | "remove-library"
-  | "run-app";
+  | "run-app"
+  | "update-lint-config"
+  | "export-lint-report"
+  | "batch-fix-errors"
+  | "ai-rename-layers"
+  | "ai-design-review"
+  | "ai-component-suggestions"
+  | "request-rich-context";
 
 export interface PluginMessage {
   type: PluginMessageType;
@@ -259,6 +269,9 @@ export interface PluginMessage {
   title?: string;
   lintVectors?: boolean;
   selection?: "user" | "page";
+  config?: Partial<LintRuleConfig>;
+  errors?: BulkError[];
+  prompt?: string;
 }
 
 export interface BulkError extends LintError {
@@ -276,7 +289,7 @@ export interface IgnoredError {
   type: string;
 }
 
-export type ActivePage = "page" | "layers" | "library" | "styles";
+export type ActivePage = "page" | "layers" | "library" | "styles" | "variables";
 
 // ============================================
 // Utility Types
@@ -287,4 +300,175 @@ export interface ColorObject {
   g: number;
   b: number;
   a?: number;
+}
+
+// ============================================
+// Lint Configuration Types
+// ============================================
+
+export interface LintRuleConfig {
+  enableColorCheck: boolean;
+  enableTypographyCheck: boolean;
+  enableSpacingCheck: boolean;
+  enableComponentCheck: boolean;
+  enableNamingCheck: boolean;
+  enableNestingCheck: boolean;
+  enableFixedDimensionsCheck: boolean;
+  enableTouchTargetCheck: boolean;
+  enableEmptyFrameCheck: boolean;
+  enableDetachedInstanceCheck: boolean;
+  enableIconSizeCheck: boolean;
+  allowedSpacingValues: number[];
+  allowedIconSizes: number[];
+  minTouchTargetSize: number;
+  maxAutoLayoutNestingDepth: number;
+}
+
+// ============================================
+// AI/Ollama Types
+// ============================================
+
+export interface OllamaRequest {
+  id: string;
+  type: "rename" | "review" | "suggestions";
+  status: "pending" | "processing" | "completed" | "error";
+  prompt: string;
+  result?: string;
+  error?: string;
+}
+
+export interface AIRenameResult {
+  nodeId: string;
+  originalName: string;
+  suggestedName: string;
+}
+
+export interface AIDesignReviewResult {
+  summary: string;
+  issues: Array<{
+    severity: ErrorSeverity;
+    message: string;
+    suggestion?: string;
+  }>;
+  score: number;
+}
+
+// ============================================
+// Rich Design Context Types (for AI analysis)
+// ============================================
+
+export interface RichLayerContext {
+  id: string;
+  name: string;
+  type: string;
+  // Dimensions
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  // Hierarchy
+  parentName: string | null;
+  parentType: string | null;
+  depth: number;
+  childCount: number;
+  siblingIndex: number;
+  siblingCount: number;
+  // Auto-layout
+  isAutoLayout: boolean;
+  autoLayoutDirection?: "HORIZONTAL" | "VERTICAL" | "NONE";
+  autoLayoutGap?: number;
+  autoLayoutPadding?: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  };
+  autoLayoutAlign?: string;
+  // Constraints
+  constraintsHorizontal?: string;
+  constraintsVertical?: string;
+  // Component info
+  isComponent: boolean;
+  isInstance: boolean;
+  mainComponentName?: string;
+  variantProperties?: Record<string, string>;
+  // Styles
+  hasFillStyle: boolean;
+  hasTextStyle: boolean;
+  hasEffectStyle: boolean;
+  hasStrokeStyle: boolean;
+  fillStyleName?: string;
+  textStyleName?: string;
+  effectStyleName?: string;
+  // Visual properties
+  opacity: number;
+  blendMode?: string;
+  visible: boolean;
+  locked: boolean;
+  // Variables
+  boundVariables: Array<{
+    property: string;
+    variableName: string;
+    variableCollection: string;
+  }>;
+  // Text-specific (if text node)
+  textContent?: string;
+  fontSize?: number;
+  fontFamily?: string;
+  // Fill info
+  fillCount: number;
+  primaryFillType?: string;
+  primaryFillColor?: string;
+  // Stroke info
+  strokeCount: number;
+  strokeWeight?: number;
+  // Effects
+  effectCount: number;
+  effectTypes?: string[];
+  // Corner radius
+  cornerRadius?: number | "mixed";
+}
+
+export interface RichDesignContext {
+  // Selection info
+  selectionCount: number;
+  selectionTypes: Record<string, number>;
+  // Page info
+  pageName: string;
+  pageChildCount: number;
+  // Document-level
+  documentColorStyles: number;
+  documentTextStyles: number;
+  documentEffectStyles: number;
+  documentComponents: number;
+  // Layer details
+  layers: RichLayerContext[];
+  // Component usage
+  componentUsage: Array<{
+    name: string;
+    instanceCount: number;
+    isLocal: boolean;
+  }>;
+  // Style usage summary
+  styleUsage: {
+    fills: Array<{ name: string; count: number }>;
+    text: Array<{ name: string; count: number }>;
+    effects: Array<{ name: string; count: number }>;
+  };
+  // Variable usage
+  variableUsage: Array<{
+    name: string;
+    collection: string;
+    count: number;
+    type: string;
+  }>;
+  // Common patterns detected
+  patterns: {
+    commonSpacingValues: number[];
+    commonCornerRadii: number[];
+    commonFontSizes: number[];
+    autoLayoutUsagePercent: number;
+    componentUsagePercent: number;
+    styleAdherencePercent: number;
+  };
 }
