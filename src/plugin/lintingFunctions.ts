@@ -126,7 +126,7 @@ export function checkRadius(
           node,
           "radius",
           "Incorrect Top Left Radius",
-          "topRightRadius" in node ? String(node.topRightRadius) : "",
+          "topLeftRadius" in node ? String(node.topLeftRadius) : "",
         ),
       );
       return;
@@ -1279,25 +1279,6 @@ export function checkType(
 
       for (const textStyle of library.text) {
         const style = textStyle.style;
-
-        let lineHeightCheck: string | number;
-
-        if (
-          "lineHeight" in node &&
-          typeof node.lineHeight !== "symbol" &&
-          node.lineHeight.unit !== "AUTO"
-        ) {
-          if (
-            typeof style.lineHeight === "object" &&
-            "value" in style.lineHeight
-          ) {
-            lineHeightCheck = style.lineHeight.value || 0;
-          } else {
-            lineHeightCheck = 0;
-          }
-        } else {
-          lineHeightCheck = "Auto";
-        }
 
         if (checkMatchingStyles(style, textObject)) {
           let lineHeightValue: string | number = "Auto";

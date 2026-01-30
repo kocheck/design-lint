@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useCallback } from "react";
 import BulkErrorListItem from "./BulkErrorListItem";
 import TotalErrorCount from "./TotalErrorCount";
-import { AnimatePresence, motion } from "framer-motion/dist/framer-motion";
 import PreloaderCSS from "./PreloaderCSS";
 import Banner from "./Banner";
 import Modal from "./Modal";
@@ -297,51 +296,20 @@ function BulkErrorList(props: BulkErrorListProps): JSX.Element {
     handleUpdatePanelSuggestion,
   ]);
 
-  // Framer motion variants
-  const listVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const pageVariants = {
-    initial: { opacity: 1, y: 0 },
-    enter: { opacity: 1, y: 0 },
-    exit: { opacity: 1, y: 0 },
-  };
-
-  const variants = {
-    initial: { opacity: 0, y: -12 },
-    enter: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: 12 },
-  };
-
   return (
-    <motion.div
-      variants={pageVariants}
-      initial="initial"
-      animate="enter"
-      exit="exit"
-      className="bulk-errors-list"
-      key="bulk-list"
-    >
+    <div className="bulk-errors-list page-enter" key="bulk-list">
       <div className="filter-pills">
         {availableFilters.map((filter, index) => (
           <React.Fragment key={filter}>
-            <motion.button
+            <button
               key={filter}
-              className={`pill ${
+              className={`pill tap-effect ${
                 selectedFilters.has(filter) ? "selected" : ""
               }`}
               onClick={() => handleFilterClick(filter)}
-              whileTap={{ scale: 0.9, opacity: 0.8 }}
             >
               {filter}
-            </motion.button>
+            </button>
             {index === 0 && <span className="pill-divider">|</span>}
           </React.Fragment>
         ))}
@@ -350,33 +318,19 @@ function BulkErrorList(props: BulkErrorListProps): JSX.Element {
         {!props.initialLoadComplete ? (
           <PreloaderCSS />
         ) : bulkErrorList.length ? (
-          <AnimatePresence>
+          <>
             {totalErrorsWithMatches > 0 && (
-              <motion.div
-                key="banner"
-                variants={variants}
-                initial="initial"
-                animate="enter"
-                exit="exit"
-              >
-                <Banner
-                  totalErrorsWithMatches={totalErrorsWithMatches}
-                  handleFixAllErrors={handleFixAllFromBanner}
-                />
-              </motion.div>
+              <Banner
+                totalErrorsWithMatches={totalErrorsWithMatches}
+                handleFixAllErrors={handleFixAllFromBanner}
+              />
             )}
-            <motion.ul
-              variants={listVariants}
-              initial="hidden"
-              animate="show"
-              className="errors-list"
-              key="wrapper-list"
-            >
+            <ul className="errors-list" key="wrapper-list">
               {errorListItems}
-            </motion.ul>
-          </AnimatePresence>
+            </ul>
+          </>
         ) : (
-          <div className="success-message">
+          <div className="success-message success-enter">
             <div className="success-shape">
               <img
                 className="success-icon"
@@ -401,7 +355,7 @@ function BulkErrorList(props: BulkErrorListProps): JSX.Element {
         error={panelError}
         suggestion={panelStyleSuggestion}
       />
-    </motion.div>
+    </div>
   );
 }
 

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion/dist/framer-motion";
 import { BulkError } from "../../types";
 
 interface ButtonProps {
@@ -34,14 +33,13 @@ function Button({ error, applyStyle }: ButtonProps) {
   };
 
   return (
-    <motion.button
-      whileTap={{ scale: 0.98, opacity: 0.8 }}
+    <button
       onClick={() => handleClick(error)}
-      className={
+      className={`tap-effect ${
         isLoading
           ? "loading-button disabled match-button"
           : "loading-button match-button"
-      }
+      }`}
     >
       {isLoading ? (
         <div className="button-loading-dots match-button-loading">
@@ -52,7 +50,7 @@ function Button({ error, applyStyle }: ButtonProps) {
       ) : (
         <>Fix All</>
       )}
-    </motion.button>
+    </button>
   );
 }
 

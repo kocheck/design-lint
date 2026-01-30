@@ -1,5 +1,4 @@
 import * as React from "react";
-import { motion } from "framer-motion/dist/framer-motion";
 
 import ErrorList from "./ErrorList";
 import PanelHeader from "./PanelHeader";
@@ -56,11 +55,6 @@ function Panel(props: PanelProps) {
   if (activeId !== undefined) {
     errors = activeId.errors;
   }
-
-  const variants = {
-    open: { opacity: 1, x: 0 },
-    closed: { opacity: 0, x: "100%" },
-  };
 
   function handlePrevNavigation() {
     if (!activeId) return;
@@ -166,11 +160,8 @@ function Panel(props: PanelProps) {
   return (
     <React.Fragment>
       {activeId !== undefined ? (
-        <motion.div
-          className={`panel`}
-          animate={isVisible ? "open" : "closed"}
-          transition={{ duration: 0.3, type: "tween" }}
-          variants={variants}
+        <div
+          className={`panel panel-slide ${isVisible ? "panel-open" : "panel-closed"}`}
         >
           <PanelHeader
             title={node.name}
@@ -190,12 +181,7 @@ function Panel(props: PanelProps) {
                 />
               </React.Fragment>
             ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 1, y: -10, scale: 0 }}
-                className="success-message"
-              >
+              <div className="success-message success-enter">
                 <div className="success-shape">
                   <img
                     className="success-icon"
@@ -203,7 +189,7 @@ function Panel(props: PanelProps) {
                   />
                 </div>
                 All errors fixed in the selection
-              </motion.div>
+              </div>
             )}
           </div>
 
@@ -224,18 +210,15 @@ function Panel(props: PanelProps) {
               Next →
             </button>
           </div>
-        </motion.div>
+        </div>
       ) : (
-        <motion.div
-          className={`panel`}
-          animate={isVisible ? "open" : "closed"}
-          transition={{ duration: 0.3, type: "tween" }}
-          variants={variants}
+        <div
+          className={`panel panel-slide ${isVisible ? "panel-open" : "panel-closed"}`}
         >
           <div className="name-wrapper">
             <Preloader />
           </div>
-        </motion.div>
+        </div>
       )}
       {isVisible ? (
         <div className="overlay" onClick={handleChange}></div>

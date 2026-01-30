@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion/dist/framer-motion";
 import { BulkError } from "../../types";
 
 interface SuggestionButtonProps {
@@ -35,14 +34,13 @@ function SuggestionButton({ error, index, applyStyle }: SuggestionButtonProps) {
   };
 
   return (
-    <motion.button
-      whileTap={{ scale: 0.98, opacity: 0.8 }}
+    <button
       onClick={() => handleClick(error, index)}
-      className={
+      className={`tap-effect ${
         isLoading
           ? "loading-button disabled match-button"
           : "loading-button match-button"
-      }
+      }`}
     >
       {isLoading ? (
         <div className="button-loading-dots match-button-loading">
@@ -53,7 +51,7 @@ function SuggestionButton({ error, index, applyStyle }: SuggestionButtonProps) {
       ) : (
         <>Apply</>
       )}
-    </motion.button>
+    </button>
   );
 }
 

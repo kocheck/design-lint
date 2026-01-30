@@ -1,5 +1,4 @@
 import * as React from "react";
-import { motion } from "framer-motion/dist/framer-motion";
 import PanelHeader from "./PanelHeader";
 import SettingsForm from "./SettingsForm";
 import "../styles/panel.css";
@@ -16,11 +15,6 @@ interface SettingsPanelProps {
 
 function SettingsPanel(props: SettingsPanelProps) {
   const isVisible = props.panelVisible;
-
-  const variants = {
-    open: { opacity: 1, x: 0 },
-    closed: { opacity: 0, x: "100%" },
-  };
 
   function handleHide() {
     props.onHandlePanelVisible(false);
@@ -49,12 +43,8 @@ function SettingsPanel(props: SettingsPanelProps) {
 
   return (
     <React.Fragment>
-      <motion.div
-        className={`panel`}
-        initial={{ opacity: 0, x: "100%" }}
-        animate={isVisible ? "open" : "closed"}
-        transition={{ duration: 0.3, type: "tween" }}
-        variants={variants}
+      <div
+        className={`panel panel-slide ${isVisible ? "panel-open" : "panel-closed"}`}
         key="settings-panel"
       >
         <PanelHeader title={"Settings"} handleHide={handleHide}></PanelHeader>
@@ -111,7 +101,7 @@ function SettingsPanel(props: SettingsPanelProps) {
             )}
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {isVisible ? <div className="overlay" onClick={handleHide}></div> : null}
     </React.Fragment>

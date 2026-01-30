@@ -57,10 +57,15 @@ npm run test        # Run Jest tests
 
 - **Prevent UI freezing** - For operations on many nodes:
   ```typescript
-  // Use processInChunks for batch operations
-  await processInChunks(nodes, async (node) => {
+  // Use chunked iteration with delay to yield to main thread
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    // Yield to main thread every CHUNK_SIZE nodes
+    if (i > 0 && i % CHUNK_SIZE === 0) {
+      await delay(YIELD_INTERVAL_MS);
+    }
     // Process single node
-  }, 50); // chunk size
+  }
   ```
 
 ### React Components
@@ -109,7 +114,7 @@ npm run test        # Run Jest tests
 
 ## Performance Guidelines
 
-1. **Batch node operations** - Use `processInChunks` for >50 nodes
+1. **Batch node operations** - Use chunked iteration with `delay()` for >50 nodes
 2. **Avoid sync loops** - Use `Promise.all` or chunked async
 3. **Cache style lookups** - Don't call `getStyleById` repeatedly for same ID
 4. **Limit UI updates** - Batch state changes, use `useMemo`/`useCallback`
@@ -117,7 +122,7 @@ npm run test        # Run Jest tests
 ## Dependencies
 
 - **React 18** - UI framework
-- **framer-motion** - Animations (use `framer-motion/dist/framer-motion` import)
+- **CSS animations** - All animations use pure CSS (no external animation library)
 - **webpack 4** - Bundler (requires `NODE_OPTIONS=--openssl-legacy-provider`)
 - **TypeScript 5.3** - Type checking
 - **ESLint 8** - Linting with `@figma/eslint-plugin-figma-plugins`

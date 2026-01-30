@@ -506,13 +506,16 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
 
   if (msg.type === "select-multiple-layers") {
     const layerArray: string[] = msg.nodeArray;
-    const nodesToBeSelected: SceneNode[] = [];
 
-    layerArray.forEach(async (item: string) => {
-      const layer = await figma.getNodeByIdAsync(item);
-      // Using selection and viewport requires an array.
-      nodesToBeSelected.push(layer as SceneNode);
-    });
+    // Use Promise.all to properly await all async node lookups
+    const nodesToBeSelected = (
+      await Promise.all(
+        layerArray.map(async (item: string) => {
+          const layer = await figma.getNodeByIdAsync(item);
+          return layer as SceneNode;
+        }),
+      )
+    ).filter((node): node is SceneNode => node !== null);
 
     // Moves the layer into focus and selects so the user can update it.
     figma.currentPage.selection = nodesToBeSelected;
@@ -806,31 +809,6 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
   // Utility function to yield to the main thread and prevent UI freezing
   async function delay(time: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, time));
-  }
-
-  // Process array in chunks to prevent UI freezing
-  async function processInChunks<T, R>(
-    items: T[],
-    processor: (item: T) => R,
-    chunkSize: number = CHUNK_SIZE,
-    yieldMs: number = YIELD_INTERVAL_MS,
-    onProgress?: (processed: number, total: number) => void,
-  ): Promise<R[]> {
-    const results: R[] = [];
-    for (let i = 0; i < items.length; i += chunkSize) {
-      const chunk = items.slice(i, i + chunkSize);
-      for (const item of chunk) {
-        results.push(processor(item));
-      }
-      // Yield to main thread between chunks
-      if (i + chunkSize < items.length) {
-        await delay(yieldMs);
-        if (onProgress) {
-          onProgress(Math.min(i + chunkSize, items.length), items.length);
-        }
-      }
-    }
-    return results;
   }
 
   // Counter to keep track of the total number of processed nodes
@@ -1405,8 +1383,8 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
 
                 const boundVariables = (node as any).boundVariables;
 
-                // Loop through all the variables on this node.
-                Object.keys(boundVariables).forEach(async (key: string) => {
+                // Loop through all the variables on this node using for...of to properly await
+                for (const key of Object.keys(boundVariables)) {
                   const variableObject = boundVariables[key];
                   let variableId: string;
                   let isFill = false;
@@ -1445,7 +1423,7 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
                       // console.log(variable);
 
                       if (variable === null) {
-                        return;
+                        continue;
                       }
 
                       const keys = Object.keys(variable.valuesByMode);
@@ -1467,7 +1445,7 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
                           fills: readonly Paint[] | symbol;
                         };
                         if (typeof nodeWithFills.fills === "symbol") {
-                          return;
+                          continue;
                         }
                         const currentFill = determineFill(nodeWithFills.fills);
                         const nodeFillType = nodeWithFills.fills[0].type;
@@ -1530,10 +1508,10 @@ figma.ui.onmessage = async (msg: Record<string, any>) => {
                         });
                       }
                     } catch (err) {
-                      return;
+                      continue;
                     }
                   }
-                });
+                }
               }
             }
           }

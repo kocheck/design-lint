@@ -1,5 +1,4 @@
 import * as React from "react";
-import { motion } from "framer-motion/dist/framer-motion";
 import PanelHeader from "./PanelHeader";
 import "../styles/panel.css";
 import type { BulkError } from "../../types";
@@ -15,12 +14,6 @@ interface StylesPanelProps {
 function StylesPanel(props: StylesPanelProps) {
   const isVisible = props.panelVisible;
   const error = props.error;
-  const suggestion = null;
-
-  const variants = {
-    open: { opacity: 1, x: 0 },
-    closed: { opacity: 0, x: "100%" },
-  };
 
   function handleHide() {
     props.onHandlePanelVisible(false);
@@ -28,29 +21,14 @@ function StylesPanel(props: StylesPanelProps) {
 
   return (
     <React.Fragment>
-      <motion.div
-        className={`panel`}
-        initial={{ opacity: 0, x: "100%" }}
-        animate={isVisible ? "open" : "closed"}
-        transition={{ duration: 0.3, type: "tween" }}
-        variants={variants}
+      <div
+        className={`panel panel-slide ${isVisible ? "panel-open" : "panel-closed"}`}
         key="styles-panel"
       >
         <PanelHeader
           title={"Compare Styles"}
           handleHide={handleHide}
         ></PanelHeader>
-
-        {/* textObject.font = node.fontName.family;
-    textObject.fontStyle = node.fontName.style;
-    textObject.fontSize = node.fontSize;
-    textObject.letterSpacingValue = node.letterSpacing.value;
-    textObject.letterSpacingUnit = node.letterSpacing.unit;
-    textObject.textAlignHorizontal = node.textAlignHorizontal;
-    textObject.textAlignVertical = node.textAlignVertical;
-    textObject.paragraphIndent = node.paragraphIndent;
-    textObject.paragraphSpacing = node.paragraphSpacing;
-    textObject.textCase = node.textCase; */}
 
         <div className="style-comparison">
           {error &&
@@ -260,7 +238,7 @@ function StylesPanel(props: StylesPanelProps) {
               </>
             )}
         </div>
-      </motion.div>
+      </div>
 
       {isVisible ? <div className="overlay" onClick={handleHide}></div> : null}
     </React.Fragment>

@@ -1,7 +1,6 @@
 import * as React from "react";
 import StyleListItemContent from "./StyleListItemContent";
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion/dist/framer-motion";
 import Button from "./Button";
 import SuggestionButton from "./SuggestionButton";
 import "../styles/modal.css";
@@ -96,25 +95,14 @@ function BulkErrorListItem(props: BulkErrorListItemProps) {
     return string.length > 46 ? string.substring(0, 46) + "..." : string;
   }
 
-  const variants = {
-    initial: { opacity: 0, y: -12, scale: 1 },
-    enter: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: 12, scale: 1 },
-  };
-
   const hasNoMatches = !error.matches || error.matches.length === 0;
   const errorTypeIsNotRadius = error.type !== "radius";
 
   return (
-    <motion.li
-      className="error-list-item"
-      positionTransition
+    <li
+      className="error-list-item list-item-enter"
       key={error.node.id + props.index}
-      variants={variants}
-      initial="initial"
-      animate="enter"
-      exit="exit"
-      type={error.type.toLowerCase()}
+      data-type={error.type.toLowerCase()}
     >
       <div className="flex-row" ref={ref} onClick={showMenu}>
         <span
@@ -143,16 +131,13 @@ function BulkErrorListItem(props: BulkErrorListItemProps) {
             </div>
           ) : null}
         </span>
-        <motion.span
-          whileTap={{ scale: 0.98, opacity: 0.8 }}
-          className="context-icon"
-        >
+        <span className="context-icon tap-effect">
           <div className="menu" ref={ref}>
             <div className="menu-trigger" onClick={showMenu}>
               <img src={require("../assets/context.svg")} />
             </div>
           </div>
-        </motion.span>
+        </span>
 
         {error.nodes.length > 1 ? (
           <ul
@@ -327,7 +312,7 @@ function BulkErrorListItem(props: BulkErrorListItemProps) {
           )}
         </>
       )}
-    </motion.li>
+    </li>
   );
 }
 

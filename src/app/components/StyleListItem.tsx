@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import StyleContent from "./StyleContent";
-import { motion } from "framer-motion/dist/framer-motion";
 import {
   RemoteFillStyle,
   RemoteStrokeStyle,
@@ -71,16 +70,11 @@ function ListItem({ style, index }: StyleListItemProps) {
           type={style.type.toLowerCase()}
           error={style}
         />
-        <motion.img
-          whileTap={{ scale: 0.9, opacity: 0.8 }}
+        <img
           onClick={() => handleSelectAll(style.groupedConsumers || {})}
-          className="overview-icon overview-content-select"
+          className="overview-icon overview-content-select tap-effect-small"
           src={require("../assets/select-all.svg")}
         />
-        {/* <img
-          className="overview-icon overview-content-arrow"
-          src={require("../assets/chevron.svg")}
-        /> */}
       </div>
       <ul className="consumer-sublist">
         {style.groupedConsumers &&

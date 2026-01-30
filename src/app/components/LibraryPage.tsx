@@ -1,5 +1,4 @@
 import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion/dist/framer-motion";
 import "../styles/library.css";
 import type { Library } from "../../types";
 
@@ -37,12 +36,6 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
       },
       "*",
     );
-  };
-
-  const variants = {
-    initial: { opacity: 0, y: -12, scale: 1 },
-    enter: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: -12, scale: 1 },
   };
 
   return (
@@ -83,58 +76,45 @@ const LibraryPage: React.FC<LibraryPageProps> = ({
       </div>
 
       <ul className="library-list">
-        <AnimatePresence>
-          {libraries.map((library, index) => (
-            <motion.li
-              className="library-list-item"
-              key={index}
-              layout
-              variants={variants}
-              initial="initial"
-              animate="enter"
-              exit="exit"
-            >
-              <div className="library-icon-wrapper">
-                <img
-                  className="library-icon"
-                  src={require("../assets/library.svg")}
-                />
-              </div>
-              <div className="library-list-item-content">
-                <h3 className="item-content-title">{library.name}</h3>
-                <span className="item-content-styles">
-                  {library.styles} styles
-                </span>
-              </div>
-              <motion.button
-                onClick={() => removeLibrary(index)}
-                className="icon icon--button library-remove"
-                whileTap={{ scale: 0.9, opacity: 0.8 }}
-              >
-                <img src={require("../assets/subtract.svg")} />
-              </motion.button>
-            </motion.li>
-          ))}
-          <motion.li
-            className="library-list-item save-library"
-            key="import"
-            layout
-            onClick={onLibraryImport}
-            whileTap={{ scale: 0.98, opacity: 0.8 }}
-            variants={variants}
-            initial="enter"
-            animate="enter"
-            exit="exit"
+        {libraries.map((library, index) => (
+          <li
+            className="library-list-item list-item-enter"
+            key={index}
+            style={{ animationDelay: `${index * 50}ms` }}
           >
             <div className="library-icon-wrapper">
               <img
                 className="library-icon"
-                src={require("../assets/add-blue.svg")}
+                src={require("../assets/library.svg")}
               />
             </div>
-            <h3 className="save-library-label">Save Library</h3>
-          </motion.li>
-        </AnimatePresence>
+            <div className="library-list-item-content">
+              <h3 className="item-content-title">{library.name}</h3>
+              <span className="item-content-styles">
+                {library.styles} styles
+              </span>
+            </div>
+            <button
+              onClick={() => removeLibrary(index)}
+              className="icon icon--button library-remove tap-effect-small"
+            >
+              <img src={require("../assets/subtract.svg")} />
+            </button>
+          </li>
+        ))}
+        <li
+          className="library-list-item save-library tap-effect"
+          key="import"
+          onClick={onLibraryImport}
+        >
+          <div className="library-icon-wrapper">
+            <img
+              className="library-icon"
+              src={require("../assets/add-blue.svg")}
+            />
+          </div>
+          <h3 className="save-library-label">Save Library</h3>
+        </li>
       </ul>
     </div>
   );

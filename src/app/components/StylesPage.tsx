@@ -7,8 +7,6 @@ interface StylesPageProps {
 }
 
 const StylesPage: React.FC<StylesPageProps> = ({ stylesInUse }) => {
-  const hasStylesInUse = stylesInUse && stylesInUse.fills.length > 0;
-
   return (
     <div className="styles-overview-wrapper">
       {/* <div>
