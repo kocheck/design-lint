@@ -30,62 +30,60 @@ const VariableItem: React.FC<VariableItemProps> = ({ variable, index }) => {
     );
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "color":
-        return "🎨";
-      case "number":
-        return "#";
-      case "string":
-        return "Aa";
-      case "boolean":
-        return "✓";
-      default:
-        return "•";
-    }
-  };
-
   const consumerCount = variable.count || 0;
   const groupedConsumers = variable.groupedConsumers || {};
 
+  // Filter out auto-generated metadata descriptions
+  const hasRealDescription =
+    variable.description &&
+    !variable.description.startsWith("Name ->") &&
+    !variable.description.includes("Collection ->") &&
+    variable.description.trim().length > 0;
+
   return (
-    <li className="style-list-item" key={`variable-${variable.id}-${index}`}>
-      <div className="style-list-item-content" onClick={handleClick}>
-        <div className="style-list-item-left">
-          <span className="variable-type-icon">
-            {getTypeIcon(variable.type)}
+    <li
+      className="variable-list-item"
+      key={`variable-${variable.id}-${index}`}
+    >
+      <div className="variable-list-item-row" onClick={handleClick}>
+        <div className="variable-name-cell">
+          <span className="variable-name" title={variable.name}>
+            {variable.name}
           </span>
-          <div className="style-list-item-info">
-            <span className="style-list-item-name">{variable.name}</span>
-            {variable.description && (
-              <span className="style-list-item-description">
-                {variable.description}
-              </span>
-            )}
-          </div>
+          {hasRealDescription && (
+            <span
+              className="variable-description"
+              title={variable.description}
+            >
+              {variable.description}
+            </span>
+          )}
         </div>
-        <div className="style-list-item-right">
-          <span className="style-list-item-value">
-            {variable.type === "color" && variable.cssSyntax ? (
-              <span
-                className="color-preview"
-                style={{ backgroundColor: variable.cssSyntax }}
-              />
-            ) : null}
-            {variable.value}
-          </span>
-          <span className="style-list-item-count">{consumerCount} uses</span>
+        <div className="variable-value-cell">
+          {variable.type === "color" && variable.cssSyntax ? (
+            <span
+              className="variable-color-swatch"
+              style={{ backgroundColor: variable.cssSyntax }}
+            />
+          ) : null}
+          <span className="variable-value">{variable.value}</span>
+        </div>
+        <div className="variable-count-cell">
+          <span className="variable-count">{consumerCount}</span>
         </div>
       </div>
 
       {isExpanded && Object.keys(groupedConsumers).length > 0 && (
-        <div className="style-list-item-expanded">
-          <div className="style-list-item-consumers">
+        <div className="variable-expanded">
+          <div className="variable-consumers">
             {Object.entries(groupedConsumers).map(([nodeType, nodeIds]) => (
               <div
                 key={nodeType}
                 className="consumer-group"
-                onClick={() => handleSelectConsumers(nodeIds as string[])}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSelectConsumers(nodeIds as string[]);
+                }}
               >
                 <span className="consumer-type">{nodeType}</span>
                 <span className="consumer-count">

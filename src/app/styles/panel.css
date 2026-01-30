@@ -278,6 +278,11 @@
   background: var(--figma-color-bg-secondary, #fff);
 }
 
+/* Raise z-index when menu is open so it appears above sibling items */
+.error-list-item:has(.select-menu__list--active) {
+  z-index: 10;
+}
+
 /* .error-list-item:hover {
   border-color: #c1c1c1;
 } */

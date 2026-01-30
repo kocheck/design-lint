@@ -63,8 +63,8 @@
   height: 32px;
   padding: 8px 4px 8px 8px;
   cursor: default;
-  color: rgba(0, 0, 0, 0.8);
-  background-color: #ffffff;
+  color: var(--figma-color-text, rgba(0, 0, 0, 0.8));
+  background-color: var(--figma-color-bg, #ffffff);
   font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: 11px;
